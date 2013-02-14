@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="app_name">RecomSys Http</string>
+    <!-- Layout Main -->
+    <string name="label_location_provider">Location Provider:</string>
+    <string name="label_GPS_status">Stato GPS:</string>
+    <string name="label_posizione">Posizione</string>
+    <string name="label_posizione_lat">latitudine:  </string>
+    <string name="label_posizione_long">longitudine: </string>
+    <string name="label_accuratezza">accuratezza: </string>
+    <string name="label_altitudine">altitudine: </string>
+    <string name="label_velocita">Velocità:</string>
+    <string name="label_stato_moto">Stato moto:</string>
+    <string name="label_avg_acc">AVG ACC:</string>
+    <string name="label_avg_gyr">AVG GYR:</string>
+    <string name="label_direzione_moto">Direzione moto:</string>
+    <string name="label_stato_uso">Stato utilizzo:</string>
+    <!-- Layout eventi_list-->
+    <string name="titolo_lista_eventi">Lista Eventi:</string>
+    <string name="titolo_lista_servizi">Lista Servizi:</string>
+</resources>

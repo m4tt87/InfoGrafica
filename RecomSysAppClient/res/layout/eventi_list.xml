@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ddd"
+    >
+	<TextView
+	    android:id="@+id/label_titolo_lista_eventi"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/titolo_lista_eventi"
+	    android:gravity="center" 
+	    android:textColor="#000"/>
+	<TextView
+	    android:id="@+id/nessun_evento_tv"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:gravity="center" 
+	    android:textColor="#000"/>	
+	<ListView
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:id="@+id/eventList" 
+	    android:textColor="#000"/>
+	
+	<TextView
+	    android:id="@+id/label_titolo_lista_servizi"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/titolo_lista_servizi"
+	    android:gravity="center" 
+	    android:textColor="#000"/>
+	<TextView
+	    android:id="@+id/nessun_servizio_tv"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:gravity="center" 
+	    android:textColor="#000"/>	
+	<ListView
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:id="@+id/serviceList" 
+	    />
+</LinearLayout>
