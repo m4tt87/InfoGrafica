@@ -4,6 +4,7 @@ package com.recsysclient;
 import java.util.Locale; 
 
 import com.recsysclient.R;
+import com.recsysclient.maps.MapsActivity;
 import com.recsysclient.network.ServiceSocket;
 import com.recsysclient.service.ContextMonitorService;
 import com.recsysclient.utility.AppDictionary;
@@ -239,7 +240,10 @@ public class MainActivity extends Activity {
     
     protected void avviaServizio() {
 		//TODO avviare servizio registrazione
-		Intent intent = new Intent(this,ContextMonitorService.class);
+    	Intent intent = new Intent(this,MapsActivity.class);
+    	startActivity(intent);
+		intent.putExtra("msg_server_attivi", msg_server_attivi);
+		/*Intent intent = new Intent(this,ContextMonitorService.class);
 		intent.putExtra("msg_server_attivi", msg_server_attivi);
 		intent.putExtra("voce_attiva", voce_attiva);
 		if(!isServiceRunning(ContextMonitorService.class.getCanonicalName())){
@@ -247,7 +251,7 @@ public class MainActivity extends Activity {
 			startService(intent);
 		}
 		else
-			Log.i("MainActivity", "avviaServizio: servizio già avviato... non verrà avviato nuovamente");
+			Log.i("MainActivity", "avviaServizio: servizio già avviato... non verrà avviato nuovamente");*/
     }
     
     protected void arrestaServizio() {
