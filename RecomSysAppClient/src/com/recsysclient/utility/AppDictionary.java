@@ -321,6 +321,13 @@ public class AppDictionary {
 	public static final String STR_OUTPUT_GPS_OFF = "GPS OFF";
 	public static final String STR_OUTPUT_GPS_NOT_AVAILABLE = "GPS NOT AVAILABLE";
 	
+	public static final String LAT = "LAT";
+	public static final String LNG = "LNG";
+	public static final String BEARING = "BEARING";
+	public static final String TILT = "TILT";
+	public static final String ZOOM = "ZOOM";
+
+	
 
 	public static boolean existKey(int key){
 		switch (key) {

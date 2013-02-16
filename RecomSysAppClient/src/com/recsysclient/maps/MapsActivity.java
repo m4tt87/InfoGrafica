@@ -37,7 +37,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
-import com.recsysclient.maps.MyContextMonitor;
+import com.recsysclient.maps.MapsContextMonitor;
 import com.recsysclient.service.ContextMonitorService;
 
 /**
@@ -70,7 +70,7 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 				//if cambio posizione
 				Log.d("MapAct", "received");
 				Bundle extras = intent.getExtras();
-				if (intent.getAction().equals(MyContextMonitor.CONTEXT_UPDATE)) {
+				if (intent.getAction().equals(MapsContextMonitor.CONTEXT_UPDATE)) {
 					bearing=extras.getFloat("bearing");
 					
 				}
@@ -83,7 +83,7 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 			}
 		};
 
-		IntentFilter filter = new IntentFilter(MyContextMonitor.CONTEXT_UPDATE);
+		IntentFilter filter = new IntentFilter(MapsContextMonitor.CONTEXT_UPDATE);
 		registerReceiver(bearingReceiver, filter);
 		Log.d("Maps", "create");
 		setUpMapIfNeeded();
