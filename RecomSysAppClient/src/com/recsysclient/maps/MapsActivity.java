@@ -47,7 +47,7 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.recsysclient.entity.PoI;
-import com.recsysclient.maps.MyContextMonitor;
+import com.recsysclient.maps.MapsContextMonitor;
 import com.recsysclient.maps.businesslogic.BusinessLogic;
 import com.recsysclient.service.ContextMonitorService;
 
