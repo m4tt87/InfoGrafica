@@ -16,13 +16,22 @@ package com.recsysclient.maps;
  * limitations under the License.
  */
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.CancelableCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptionsCreator;
 import com.recsysclient.R;
 import com.recsysclient.RecommendationListActivity;
 
@@ -37,7 +46,10 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.recsysclient.entity.PoI;
+import com.recsysclient.entity.Category;
 import com.recsysclient.maps.MyContextMonitor;
+import com.recsysclient.maps.businesslogic.BusinessLogic;
 import com.recsysclient.service.ContextMonitorService;
 
 /**
@@ -54,46 +66,76 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	private CameraPosition currentPosition;
 
 	private GoogleMap mMap;
-
-	private BroadcastReceiver bearingReceiver;
+	private Map<Long,Marker> markers;
+	private BroadcastReceiver broadcastReceiver;
 	private float bearing = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.maps);
-		    	
-		bearingReceiver = new BroadcastReceiver() {
+		markers = new HashMap<Long,Marker>(0);
+		broadcastReceiver = new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				//if cambio posizione
 				Log.d("MapAct", "received");
 				Bundle extras = intent.getExtras();
-				if (intent.getAction().equals(MyContextMonitor.CONTEXT_UPDATE)) {
+				if (intent.getAction().equals(BusinessLogic.POSITION_UPDATE)) {
 					bearing=extras.getFloat("bearing");
 					
+
 				}
-				/*else if(intent.getAction().equals(MyContextMonitor.MARKERS_UPDATE){
-					markers=extras = 
-				}*/
+				else if(intent.getAction().equals(BusinessLogic.MARKERS_UPDATE)){
+					List<PoI> toAddMarkers= (List<PoI>) extras.get("newPoIs");
+					List<PoI> toRemoveMarkers= (List<PoI>) extras.get("oldPoIs");
+					addMarkers(toAddMarkers);
+					removeMarkers(toRemoveMarkers);
+				}
 				setUpMap();
-				
-				
+
+
 			}
 		};
 
-		IntentFilter filter = new IntentFilter(MyContextMonitor.CONTEXT_UPDATE);
-		registerReceiver(bearingReceiver, filter);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(BusinessLogic.POSITION_UPDATE);
+		filter.addAction(BusinessLogic.MARKERS_UPDATE);
+		registerReceiver(broadcastReceiver, filter);
 		Log.d("Maps", "create");
 		setUpMapIfNeeded();
+	}
+
+	protected void removeMarkers(List<PoI> toRemoveMarkers) {
+		for( PoI p : toRemoveMarkers ){
+			markers.get(p.get_idEvento()).remove();
+		}
+	}
+
+	protected void addMarkers(List<PoI> toAddMarkers) {
+
+		for( PoI p : toAddMarkers ){
+			BitmapDescriptor icon=BitmapDescriptorFactory.fromFile("res/drawable/"+p.getCategoria()+"_icon.png");
+			if( icon==null)
+				icon=BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+			
+			Marker marker = mMap.addMarker(new MarkerOptions()
+			.position(new LatLng( p.getLat(), p.getLng()))
+			.title(p.get_nomeEvento())
+			.snippet(p.get_descrizione())
+			.icon(BitmapDescriptorFactory.fromFile("")));
+			markers.put(p.get_idEvento(), marker);
+		}
+
+
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		Log.d("Maps", "resume");
-		
+
 		setUpMapIfNeeded();
 	}
 
@@ -111,7 +153,7 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	private void setUpMap() {
 		// We will provide our own zoom controls.
 		Log.d("MapAct", "Set");
-		
+
 		mMap.getUiSettings().setZoomControlsEnabled(false);
 		mMap.moveCamera( CameraUpdateFactory.newCameraPosition(getCameraPosition()));
 	}
@@ -262,18 +304,18 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	public CameraPosition getCameraPosition(){
 		LatLng coords= new LatLng(40.643136,17.303009);
 		Log.d("MapAct", "Set bearing to "+bearing);
-		
+
 		return new CameraPosition.Builder().target(coords)
 				.zoom(12f)
 				.bearing(bearing)
 				.tilt(89)
 				.build();
 	}
-	
-	 @Override
-	    protected void onDestroy() {
-	    	super.onDestroy();
-	    	unregisterReceiver(bearingReceiver);
-	    	
-	    }
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unregisterReceiver(broadcastReceiver);
+
+	}
 }
