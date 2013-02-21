@@ -326,6 +326,8 @@ public class AppDictionary {
 	public static final String BEARING = "BEARING";
 	public static final String TILT = "TILT";
 	public static final String ZOOM = "ZOOM";
+	
+	public static final String RETRIEVE_URI="http://api.geonames.org/findNearbyWikipedia?lat=40.35&lng=18.17&username=m4tt&lang=it&maxRows=500&radius=20";
 
 	
 
