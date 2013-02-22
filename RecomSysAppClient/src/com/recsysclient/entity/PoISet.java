@@ -1,10 +1,10 @@
-package com.recsysclient.maps.businesslogic;
+package com.recsysclient.entity;
 
 import java.util.Set;
 
 public class PoISet {
 	
-	protected Set<PoI> geonames;
+	private Set<PoI> geonames;
 	public Set<PoI> getPoiSet() {
 		return geonames;
 	}

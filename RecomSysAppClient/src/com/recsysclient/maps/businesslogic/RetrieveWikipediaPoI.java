@@ -1,20 +1,20 @@
 package com.recsysclient.maps.businesslogic;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.recsysclient.entity.PoI;
+import com.recsysclient.entity.PoISet;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-public class RetrieveWikipediaPoI{
+public class RetrieveWikipediaPoI implements StrategyRetrievePoI{
 	private Client client;
 	private WebResource resource;
 	private Map <Integer, Integer> map;
@@ -71,9 +71,15 @@ public class RetrieveWikipediaPoI{
 
 		}
 		
-		System.out.println(poiSet);
+		//System.out.println(poiSet);
 		return poiSet;
 		
+	}
+
+	@Override
+	public Set<PoI> getPoISet() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
