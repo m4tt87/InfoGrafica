@@ -19,10 +19,8 @@ package com.recsysclient.maps;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -35,13 +33,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptionsCreator;
-import com.google.android.gms.maps.model.VisibleRegion;
 import com.recsysclient.R;
-import com.recsysclient.RecommendationListActivity;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -50,16 +43,15 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.recsysclient.entity.PoI;
 import com.recsysclient.entity.Position;
-import com.recsysclient.maps.MapsContextMonitor;
 import com.recsysclient.maps.businesslogic.BusinessLogic;
 import com.recsysclient.maps.utils.ExternalMarker;
 import com.recsysclient.maps.utils.MapsVisibleRegion;
-import com.recsysclient.service.ContextMonitorService;
+import com.recsysclient.utility.AppDictionary;
+import com.recsysclient.utility.IntentHelper;
 
 /**
  * This shows how to change the camera position for the map.
@@ -80,7 +72,7 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	private Set<PoI> pois;
 	private BroadcastReceiver broadcastReceiver;
 
-	
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -95,55 +87,55 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 				//if cambio posizione
 				Log.d("MapAct", "received");
 				Bundle extras = intent.getExtras();
-				if (intent.getAction().equals(BusinessLogic.POSITION_UPDATE)) {
-					currentPosition=(Position) extras.get("position");
-					changeCamera( CameraUpdateFactory.newCameraPosition(getCameraPosition()) );
-					MapsVisibleRegion region= new MapsVisibleRegion(mMap.getProjection().getVisibleRegion());
-					externalMarkers = strategy.doComputingExternalMarkers( pois, region, currentPosition.getBearing());
-					drawExternalMarkers();
-				}
-				else if(intent.getAction().equals(BusinessLogic.MARKERS_UPDATE)){
-					
-					Set<PoI> newPoIs = (Set<PoI>) extras.get("newPoIs");
-					Set<PoI> oldPoIs = new HashSet<PoI>(pois);
-					oldPoIs.removeAll(newPoIs);
-					pois.removeAll(oldPoIs);
-					pois.addAll(newPoIs);
-					
-					updateMarkers(oldPoIs);
-				}
-				setUpMap();
+				if (intent.getAction().equals(BusinessLogic.BUSINESSLOGIC)) {
+					if( extras.getBoolean(AppDictionary.POSITION) ){
+						currentPosition=(Position) extras.get("position");
+						changeCamera( CameraUpdateFactory.newCameraPosition(getCameraPosition()) );
+						MapsVisibleRegion region= new MapsVisibleRegion(mMap.getProjection().getVisibleRegion());
+						externalMarkers = strategy.doComputingExternalMarkers( pois, region, currentPosition.getBearing());
+						drawExternalMarkers();
+					}
+					else if( extras.getBoolean(AppDictionary.POI) ){
 
+						Set<PoI> newPoIs = (Set<PoI>) IntentHelper.getObjectForKey(AppDictionary.POI);
+						Set<PoI> oldPoIs = new HashSet<PoI>(pois);
+						oldPoIs.removeAll(newPoIs);
+						pois.removeAll(oldPoIs);
+						pois.addAll(newPoIs);
+
+						updateMarkers(oldPoIs);
+					}
+					setUpMap();
+				}
 
 			}
 		};
 
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(BusinessLogic.POSITION_UPDATE);
-		filter.addAction(BusinessLogic.MARKERS_UPDATE);
+		filter.addAction(BusinessLogic.BUSINESSLOGIC);
 		registerReceiver(broadcastReceiver, filter);
 		Log.d("Maps", "create");
 		setUpMapIfNeeded();
 	}
 
 	protected void updateMarkers( Collection<PoI> toRemovePoIs) {
-		
+
 		for( PoI p : toRemovePoIs ){
-			markers.get(p.get_idEvento()).remove();
+			markers.get(p.getId()).remove();
 		}
-		
+
 		for( PoI p : pois ){
-			if( !markers.containsKey(p.get_idEvento()) ){
-				BitmapDescriptor icon=BitmapDescriptorFactory.fromFile("res/drawable/"+p.getCategoria()+"_icon.png");
+			if( !markers.containsKey(p.getId()) ){
+				BitmapDescriptor icon=BitmapDescriptorFactory.fromFile("res/drawable/"+p.getFeature()+"_icon.png");
 				if( icon==null)
 					icon=BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
-	
+
 				Marker marker = mMap.addMarker(new MarkerOptions()
 				.position(new LatLng( p.getLat(), p.getLng()))
-				.title(p.get_nomeEvento())
-				.snippet(p.get_descrizione())
+				.title(p.getTitle())
+				.snippet(p.getSummary())
 				.icon(icon));
-				markers.put(p.get_idEvento(), marker);
+				markers.put(p.getId(), marker);
 			}
 		}
 	}

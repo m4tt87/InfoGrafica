@@ -321,11 +321,16 @@ public class AppDictionary {
 	public static final String STR_OUTPUT_GPS_OFF = "GPS OFF";
 	public static final String STR_OUTPUT_GPS_NOT_AVAILABLE = "GPS NOT AVAILABLE";
 	
+	//Maps dictionary
 	public static final String LAT = "LAT";
 	public static final String LNG = "LNG";
 	public static final String BEARING = "BEARING";
 	public static final String TILT = "TILT";
 	public static final String ZOOM = "ZOOM";
+	public static final String POSITION = "POSITION";
+	public static final String POI = "POI";
+	
+	public static final String RETRIEVE_URI="http://api.geonames.org/findNearbyWikipedia?lat=40.35&lng=18.17&username=m4tt&lang=it&maxRows=500&radius=20";
 
 	
 
