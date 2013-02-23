@@ -1,22 +1,22 @@
 package com.recsysclient.entity;
 
 public class PoI extends Evento {
-	private float lat;
-	private float lng;
+	private double lat;
+	private double lng;
 	private String categoria;
 	private String descrDettaglio;
 	private String URI_modello; //eventuale URI al file contenente il modello 3D del
 	
-	public float getLat() {
+	public double getLat() {
 		return lat;
 	}
-	public void setLat(float lat) {
+	public void setLat(double lat) {
 		this.lat = lat;
 	}
-	public float getLng() {
+	public double getLng() {
 		return lng;
 	}
-	public void setLng(float lng) {
+	public void setLng(double lng) {
 		this.lng = lng;
 	}
 	public String getCategoria() {

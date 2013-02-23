@@ -16,9 +16,14 @@ package com.recsysclient.maps;
  * limitations under the License.
  */
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.CameraUpdate;
@@ -30,8 +35,10 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptionsCreator;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.recsysclient.R;
 import com.recsysclient.RecommendationListActivity;
 
@@ -47,8 +54,11 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.recsysclient.entity.PoI;
+import com.recsysclient.entity.Position;
 import com.recsysclient.maps.MapsContextMonitor;
 import com.recsysclient.maps.businesslogic.BusinessLogic;
+import com.recsysclient.maps.utils.ExternalMarker;
+import com.recsysclient.maps.utils.MapsVisibleRegion;
 import com.recsysclient.service.ContextMonitorService;
 
 /**
@@ -62,18 +72,22 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	 */
 	private static final int SCROLL_BY_PX = 100;
 
-	private CameraPosition currentPosition;
-
+	private Position currentPosition;
+	private IDoComputingExternalStrategy strategy;
 	private GoogleMap mMap;
 	private Map<Long,Marker> markers;
+	private Map<Integer, List<ExternalMarker>> externalMarkers;
+	private Set<PoI> pois;
 	private BroadcastReceiver broadcastReceiver;
-	private float bearing = 0;
+
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.maps);
 		markers = new HashMap<Long,Marker>(0);
+		pois = new HashSet<PoI>(0);
 		broadcastReceiver = new BroadcastReceiver() {
 
 			@Override
@@ -82,15 +96,21 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 				Log.d("MapAct", "received");
 				Bundle extras = intent.getExtras();
 				if (intent.getAction().equals(BusinessLogic.POSITION_UPDATE)) {
-					bearing=extras.getFloat("bearing");
-					
-
+					currentPosition=(Position) extras.get("position");
+					changeCamera( CameraUpdateFactory.newCameraPosition(getCameraPosition()) );
+					MapsVisibleRegion region= new MapsVisibleRegion(mMap.getProjection().getVisibleRegion());
+					externalMarkers = strategy.doComputingExternalMarkers( pois, region, currentPosition.getBearing());
+					drawExternalMarkers();
 				}
 				else if(intent.getAction().equals(BusinessLogic.MARKERS_UPDATE)){
-					List<PoI> toAddMarkers= (List<PoI>) extras.get("newPoIs");
-					List<PoI> toRemoveMarkers= (List<PoI>) extras.get("oldPoIs");
-					addMarkers(toAddMarkers);
-					removeMarkers(toRemoveMarkers);
+					
+					Set<PoI> newPoIs = (Set<PoI>) extras.get("newPoIs");
+					Set<PoI> oldPoIs = new HashSet<PoI>(pois);
+					oldPoIs.removeAll(newPoIs);
+					pois.removeAll(oldPoIs);
+					pois.addAll(newPoIs);
+					
+					updateMarkers(oldPoIs);
 				}
 				setUpMap();
 
@@ -106,27 +126,30 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 		setUpMapIfNeeded();
 	}
 
-	protected void removeMarkers(List<PoI> toRemoveMarkers) {
-		for( PoI p : toRemoveMarkers ){
+	protected void updateMarkers( Collection<PoI> toRemovePoIs) {
+		
+		for( PoI p : toRemovePoIs ){
 			markers.get(p.get_idEvento()).remove();
+		}
+		
+		for( PoI p : pois ){
+			if( !markers.containsKey(p.get_idEvento()) ){
+				BitmapDescriptor icon=BitmapDescriptorFactory.fromFile("res/drawable/"+p.getCategoria()+"_icon.png");
+				if( icon==null)
+					icon=BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+	
+				Marker marker = mMap.addMarker(new MarkerOptions()
+				.position(new LatLng( p.getLat(), p.getLng()))
+				.title(p.get_nomeEvento())
+				.snippet(p.get_descrizione())
+				.icon(icon));
+				markers.put(p.get_idEvento(), marker);
+			}
 		}
 	}
 
-	protected void addMarkers(List<PoI> toAddMarkers) {
-
-		for( PoI p : toAddMarkers ){
-			BitmapDescriptor icon=BitmapDescriptorFactory.fromFile("res/drawable/"+p.getCategoria()+"_icon.png");
-			if( icon==null)
-				icon=BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
-			
-			Marker marker = mMap.addMarker(new MarkerOptions()
-			.position(new LatLng( p.getLat(), p.getLng()))
-			.title(p.get_nomeEvento())
-			.snippet(p.get_descrizione())
-			.icon(BitmapDescriptorFactory.fromFile("")));
-			markers.put(p.get_idEvento(), marker);
-		}
-
+	protected void drawExternalMarkers() {
+		// TODO Auto-generated method stub
 
 	}
 
@@ -173,12 +196,12 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	 * Called when a marker is clicked
 	 */
 	public void onLocationChanged(Location location) {
-		//da implementare
+		//TODO da implementare
 		if (!checkReady()) {
 			return;
 		}
 
-		changeCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
+		//changeCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
 	}
 
 	/**
@@ -286,28 +309,19 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	}
 
 	/**
-	 * Change the camera position by moving or animating the camera depending on the state of the
-	 * animate toggle button.
+	 * Change the camera position by animating the camera 
 	 */
 	private void changeCamera(CameraUpdate update, CancelableCallback callback) {
-		/*Da reimplementare
-		 * 
-		 * boolean animated = ((CompoundButton) findViewById(R.id.animate)).isChecked();
-        if (animated) {
-            mMap.animateCamera(update, callback);
-        } else {
-            mMap.moveCamera(update);
-        }*/
+		mMap.animateCamera(update, callback);
 	}
 
-	public CameraPosition getCameraPosition(){
-		LatLng coords= new LatLng(40.643136,17.303009);
-		Log.d("MapAct", "Set bearing to "+bearing);
+	private CameraPosition getCameraPosition(){
+		Log.d("MapAct", "Set position");
 
-		return new CameraPosition.Builder().target(coords)
-				.zoom(12f)
-				.bearing(bearing)
-				.tilt(89)
+		return new CameraPosition.Builder().target( new LatLng(currentPosition.getLat(),currentPosition.getLng()))
+				.zoom(currentPosition.getZoom())
+				.bearing(currentPosition.getBearing())
+				.tilt(currentPosition.getTilt())
 				.build();
 	}
 
