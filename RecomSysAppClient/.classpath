@@ -4,9 +4,5 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="lib" path="C:/Users/Mattia/Desktop/lib/jersey-client-1.17.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Mattia/Desktop/lib/jersey-core-1.17.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Mattia/Desktop/gson-2.2.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Mattia/Desktop/gson-2.2.2-javadoc.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
