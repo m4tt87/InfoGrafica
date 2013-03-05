@@ -72,12 +72,6 @@ public class SamplesWindow{
 	float min_sum_gyr;
 	float avg_sum_gyr;
 	
-	float min_inclinazione_bearing;
-	float max_inclinazione_bearing;
-	float min_inclinazione_pitch;
-	float max_inclinazione_pitch;
-	float min_inclinazione_roll;
-	float max_inclinazione_roll;
 	double meanBearing;
 	
 	int freq_oscillazioni = 0;

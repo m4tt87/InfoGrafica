@@ -4,8 +4,7 @@ public class ContextInfo {
 	private float lat;
 	private float lng;
 	private double bearing;
-	private String motionState;
-	private String motionKind;
+	private int idMotionState;
 	private String locationProvider;
 	private float gpsStatus;
 	public float getLat() {
@@ -26,17 +25,11 @@ public class ContextInfo {
 	public void setBearing(double d) {
 		this.bearing = d;
 	}
-	public String getMotionState() {
-		return motionState;
+	public int getIdMotionState() {
+		return idMotionState;
 	}
-	public void setMotionState(String motionState) {
-		this.motionState = motionState;
-	}
-	public String getMotionKind() {
-		return motionKind;
-	}
-	public void setMotionKind(String motionKind) {
-		this.motionKind = motionKind;
+	public void setIdMotionState(int idMotionState) {
+		this.idMotionState = idMotionState;
 	}
 	public String getLocationProvider() {
 		return locationProvider;

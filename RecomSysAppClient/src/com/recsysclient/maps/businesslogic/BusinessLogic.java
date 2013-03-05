@@ -25,9 +25,6 @@ import com.recsysclient.utility.Setting;
 public class BusinessLogic extends Service{
 	public static final String BUSINESSLOGIC="BUSINESSLOGIC";
 	
-	private boolean hasNewPosition;
-	private boolean hasNewPoI;
-	
 	private Set<PoI> returnedList;
 	private Set<PoI> filteredList;
 
@@ -59,7 +56,8 @@ public class BusinessLogic extends Service{
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		positionUpdateInterval=Setting.POSITION_SAMPLE_INTERVAL;
+		positionUpdateInterval=Setting.POSITION_SAMPLE_INTERVAL_MS;
+		
 		delay=0;
 		
 		retrievePoI=new RetrieveWikipediaPoI();
@@ -80,17 +78,16 @@ public class BusinessLogic extends Service{
 		TimerTask task=new TimerTask(){
 		
 			Intent intent = new Intent(BUSINESSLOGIC);
+			StatoContesto statoContesto;
 
 			@Override
 			public void run() {
-				StatoContesto statoContesto;
 				statoContesto = statusDetector.calcolaStatoContesto();
 				
 				info.setLat(statoContesto.getLatitudine());
 				info.setLng(statoContesto.getLongitudine());
 				info.setBearing(statoContesto.getBearing());
-				info.setMotionState(AppDictionary.getStatoMotoForOntology(statoContesto.getId_stato_moto()));
-				info.setMotionKind(AppDictionary.getMezzoUtenteForOntology(statoContesto.getId_stato_moto()));
+				info.setIdMotionState(statoContesto.getId_stato_moto());
 				info.setLocationProvider(statusDetector.getLocationProvider());
 				info.setGpsStatus(statusDetector.getGpsStatus());
 				//FIXME da commentare quando il server sarà su
@@ -109,7 +106,7 @@ public class BusinessLogic extends Service{
         				
 				//applica il filtro appropriato alla lista completa per verificare la presenza di nuovi PoI nel raggio interessante per l'applicazione
         		if(!returnedList.isEmpty()){
-	        		if(info.getMotionState()==AppDictionary.STR_OUTPUT_MOTION_CAR)
+	        		if(statoContesto.getId_stato_moto()==AppDictionary.MOTION_CAR)
 	        			filter=new FilterInAuto();
 	        			
 	        		else
@@ -132,7 +129,7 @@ public class BusinessLogic extends Service{
 		timer = new Timer();
 		
 		if(positionUpdateInterval<=0) 
-			positionUpdateInterval = Setting.POSITION_SAMPLE_INTERVAL;
+			positionUpdateInterval = Setting.POSITION_SAMPLE_INTERVAL_MS;
 		if(delay<0)
 			delay=0;
 		
