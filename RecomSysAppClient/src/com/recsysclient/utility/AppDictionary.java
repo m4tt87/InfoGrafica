@@ -326,7 +326,9 @@ public class AppDictionary {
 	public static final String LNG = "LNG";
 	public static final String BEARING = "BEARING";
 	public static final String TILT = "TILT";
+	public static final int DEFAULT_TILT=90;
 	public static final String ZOOM = "ZOOM";
+	public static final float DEFAULT_ZOOM=10;
 	public static final String POSITION = "POSITION";
 	public static final String POI = "POI";
 	
