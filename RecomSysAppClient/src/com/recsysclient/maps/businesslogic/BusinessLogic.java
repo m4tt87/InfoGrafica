@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.recsysclient.entity.ContextInfo;
 import com.recsysclient.entity.PoI;
@@ -35,8 +36,6 @@ public class BusinessLogic extends Service{
 	private int delay;
 	Timer timer;
 	
-	private BroadcastReceiver broadcastReceiver;
-	
 	private ContextInfo lastRequiredInfo;
 	private ContextInfo info;
 	
@@ -56,13 +55,16 @@ public class BusinessLogic extends Service{
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Log.d("BL","Creo!");
+		
 		positionUpdateInterval=Setting.POSITION_SAMPLE_INTERVAL_MS;
 		
 		delay=0;
-		
+		info = new ContextInfo();
 		retrievePoI=new RetrieveWikipediaPoI();
 		
 		statusDetector =  StatusDetector.getInstance(this);
+		Log.d("BL","Ho Creato!");
 	}
 
 	@Override
@@ -73,6 +75,7 @@ public class BusinessLogic extends Service{
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.d("BL","Started!");
 		statusDetector.startMonitoring();
 		
 		TimerTask task=new TimerTask(){
@@ -82,6 +85,7 @@ public class BusinessLogic extends Service{
 
 			@Override
 			public void run() {
+				Log.d("BL","Runned!");
 				statoContesto = statusDetector.calcolaStatoContesto();
 				
 				info.setLat(statoContesto.getLatitudine());
@@ -116,12 +120,14 @@ public class BusinessLogic extends Service{
 	        				
 	        		IntentHelper.addObjectForKey(AppDictionary.POI, filteredList);
 	        		intent.putExtra(AppDictionary.POI, true);
+	        		Log.d("BL","Sent POI!");
 	        		sendBroadcast(intent);
         		}
         				
         		if(info!=null){
 	        		IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
 	        		intent.putExtra(AppDictionary.CONTEXT_INFO, true);
+	        		Log.d("BL","Sent Info!");
 					sendBroadcast(intent);
         		}
 			}

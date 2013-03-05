@@ -170,8 +170,11 @@ public StatoContesto calcolaStatoContestoPercepetron(){
 	Log.i("SamplesWindow", "calcolaStatoContestoFisher: START:"+ time_start);
 	
 	
-	int last_index = size-1;
+	int last_index = size;
+	Log.d("samples", "Size:"+size);
+	last_index--;
 	printStatus(true);
+	Log.d("samples", "Size before if:"+size);
 	if(size>0){
 		long timestamp = System.currentTimeMillis();
 		

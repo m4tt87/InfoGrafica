@@ -55,7 +55,8 @@ public class Outlier {
 	
 	private void calcolaPurgedList(){
 		purgedList=new ArrayList<Double>(list);
-		purgedList.removeAll(outlierList);
+		if(outlierList!=null && outlierList.size()!=0)
+			purgedList.removeAll(outlierList);
 	}
 	
 	public List<Double> getPurgedList(){

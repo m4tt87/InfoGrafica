@@ -78,7 +78,12 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.maps);
-		markers = new HashMap<Long,Marker>(0);
+		Log.d("MapsAct","Starto la logica!");
+		Intent intent = new Intent(this,BusinessLogic.class);
+    	startService(intent);
+    	Log.d("MapsAct","Dovrei aver Startato la logica!");
+		
+    	markers = new HashMap<Long,Marker>(0);
 		pois = new HashSet<PoI>(0);
 		broadcastReceiver = new BroadcastReceiver() {
 
@@ -99,13 +104,14 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 
 						Set<PoI> newPoIs = (Set<PoI>) IntentHelper.getObjectForKey(AppDictionary.POI);
 						Set<PoI> oldPoIs = new HashSet<PoI>(pois);
+						
 						oldPoIs.removeAll(newPoIs);
-						pois.removeAll(oldPoIs);
+						if(oldPoIs.size()!=0)
+							pois.removeAll(oldPoIs);
 						pois.addAll(newPoIs);
 
 						updateMarkers(oldPoIs);
 					}
-					setUpMap();
 				}
 
 			}
@@ -310,6 +316,14 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	private CameraPosition getCameraPosition(){
 		Log.d("MapAct", "Set position");
 		float zoom;
+		
+		if( currentContextInfo == null)
+			return new CameraPosition.Builder().target( new LatLng( 40.27, 18.05))
+					.zoom(10f)
+					.bearing((float) 0)
+					.tilt(AppDictionary.DEFAULT_TILT)
+					.build();
+		
 		switch(currentContextInfo.getIdMotionState()){
 		case AppDictionary.MOTION_CAR:
 		case AppDictionary.MOTION_STILL_CAR:

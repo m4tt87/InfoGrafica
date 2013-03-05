@@ -24,7 +24,6 @@ public class RetrieveWikipediaPoI implements StrategyRetrievePoI{
 	
 	public RetrieveWikipediaPoI(){
 		
-		//TODO: http://api.geonames.org/findNearbyWikipedia?lat=40.35&lng=18.17&username=m4tt&lang=it&maxRows=500&radius=20
 		client = Client.create();
 		map= new HashMap<Integer, Integer>();
 	}

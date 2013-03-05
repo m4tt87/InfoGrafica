@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import com.recsysclient.R;
 import com.recsysclient.maps.MapsActivity;
+import com.recsysclient.maps.businesslogic.BusinessLogic;
 import com.recsysclient.network.ServiceSocket;
 import com.recsysclient.service.ContextMonitorService;
 import com.recsysclient.utility.AppDictionary;
@@ -78,9 +79,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
         
         // Verifica la disponibilità del TTS (Text To Speak).
-		Intent checkIntent = new Intent();
+		/*Intent checkIntent = new Intent();
 		checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-		startActivityForResult(checkIntent, TTS_CHECK_REQUEST_CODE);
+		startActivityForResult(checkIntent, TTS_CHECK_REQUEST_CODE);*/
         
         
 		tw_LocationProvider = (TextView)findViewById(R.id.tw_LocationProvider);
@@ -240,9 +241,9 @@ public class MainActivity extends Activity {
     
     protected void avviaServizio() {
 		//TODO avviare servizio registrazione
+    			
     	Intent intent = new Intent(this,MapsActivity.class);
     	startActivity(intent);
-		intent.putExtra("msg_server_attivi", msg_server_attivi);
 		/*Intent intent = new Intent(this,ContextMonitorService.class);
 		intent.putExtra("msg_server_attivi", msg_server_attivi);
 		intent.putExtra("voce_attiva", voce_attiva);
