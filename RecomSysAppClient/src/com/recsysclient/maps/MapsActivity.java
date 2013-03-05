@@ -45,8 +45,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.recsysclient.entity.ContextInfo;
 import com.recsysclient.entity.PoI;
-import com.recsysclient.entity.Position;
 import com.recsysclient.maps.businesslogic.BusinessLogic;
 import com.recsysclient.maps.utils.ExternalMarker;
 import com.recsysclient.maps.utils.MapsVisibleRegion;
@@ -64,8 +64,8 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	 */
 	private static final int SCROLL_BY_PX = 100;
 
-	private Position currentPosition;
-	private IDoComputingExternalStrategy strategy;
+	private ContextInfo currentContextInfo;
+	private IComputeExternalMarkersStrategy strategy;
 	private GoogleMap mMap;
 	private Map<Long,Marker> markers;
 	private Map<Integer, List<ExternalMarker>> externalMarkers;
@@ -88,14 +88,14 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 				Log.d("MapAct", "received");
 				Bundle extras = intent.getExtras();
 				if (intent.getAction().equals(BusinessLogic.BUSINESSLOGIC)) {
-					if( extras.getBoolean(AppDictionary.POSITION) ){
-						currentPosition=(Position) extras.get("position");
+					if( extras.getBoolean(AppDictionary.CONTEXT_INFO) ){
+						currentContextInfo=(ContextInfo)IntentHelper.getObjectForKey(AppDictionary.CONTEXT_INFO);
 						changeCamera( CameraUpdateFactory.newCameraPosition(getCameraPosition()) );
 						MapsVisibleRegion region= new MapsVisibleRegion(mMap.getProjection().getVisibleRegion());
-						externalMarkers = strategy.doComputingExternalMarkers( pois, region, currentPosition.getBearing());
+						externalMarkers = strategy.computeExternalMarkers( pois, region, currentContextInfo.getBearing());
 						drawExternalMarkers();
 					}
-					else if( extras.getBoolean(AppDictionary.POI) ){
+					if( extras.getBoolean(AppDictionary.POI) ){
 
 						Set<PoI> newPoIs = (Set<PoI>) IntentHelper.getObjectForKey(AppDictionary.POI);
 						Set<PoI> oldPoIs = new HashSet<PoI>(pois);
@@ -309,11 +309,19 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 
 	private CameraPosition getCameraPosition(){
 		Log.d("MapAct", "Set position");
-
-		return new CameraPosition.Builder().target( new LatLng(currentPosition.getLat(),currentPosition.getLng()))
-				.zoom(currentPosition.getZoom())
-				.bearing(currentPosition.getBearing())
-				.tilt(currentPosition.getTilt())
+		float zoom;
+		switch(currentContextInfo.getIdMotionState()){
+		case AppDictionary.MOTION_CAR:
+		case AppDictionary.MOTION_STILL_CAR:
+			zoom=10f;
+			break;
+		default:
+			zoom=15f;			
+		}
+		return new CameraPosition.Builder().target( new LatLng(currentContextInfo.getLat(),currentContextInfo.getLng()))
+				.zoom(zoom)
+				.bearing((float) currentContextInfo.getBearing())
+				.tilt(AppDictionary.DEFAULT_TILT)
 				.build();
 	}
 

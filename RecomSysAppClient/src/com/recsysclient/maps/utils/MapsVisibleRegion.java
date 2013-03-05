@@ -6,6 +6,13 @@ public class MapsVisibleRegion {
 	
 	public MapsVisibleRegion(){}
 	
+	public MapsVisibleRegion( MapsLatLng nearLeft, MapsLatLng nearRight, MapsLatLng farLeft, MapsLatLng farRight ){
+		this.nearLeft= nearLeft;
+		this.nearRight= nearRight;
+		this.farLeft=farLeft;
+		this.farRight= farRight;
+	}
+	
 	public MapsVisibleRegion( VisibleRegion googleVR ){
 		this.nearLeft= new MapsLatLng(googleVR.nearLeft);
 		this.nearRight= new MapsLatLng(googleVR.nearRight);

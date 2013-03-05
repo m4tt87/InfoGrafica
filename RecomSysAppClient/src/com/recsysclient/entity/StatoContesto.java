@@ -17,6 +17,8 @@ public class StatoContesto {
 	private String mezzo_utente;
 	private float velocita;
 	
+	private double bearing;
+	
 	private int id_stato_moto;
 	private int stato_device;
 	private int tipo_utilizzo_device;
@@ -181,6 +183,18 @@ public class StatoContesto {
 	}
 
 	
+	public double getBearing() {
+		return bearing;
+	}
+
+
+
+	public void setBearing(double bearing) {
+		this.bearing = bearing;
+	}
+
+
+
 	@Override
 	public String toString(){
 		String str ="";

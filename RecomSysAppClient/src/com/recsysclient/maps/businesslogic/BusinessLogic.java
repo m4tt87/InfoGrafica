@@ -12,9 +12,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import com.recsysclient.entity.ContextInfo;
 import com.recsysclient.entity.PoI;
-import com.recsysclient.entity.Position;
+import com.recsysclient.entity.StatoContesto;
 import com.recsysclient.maps.MapsContextMonitor;
+import com.recsysclient.service.StatusDetector;
 import com.recsysclient.utility.AppDictionary;
 import com.recsysclient.utility.DistanceBetweenCoords;
 import com.recsysclient.utility.IntentHelper;
@@ -22,9 +24,6 @@ import com.recsysclient.utility.Setting;
 
 public class BusinessLogic extends Service{
 	public static final String BUSINESSLOGIC="BUSINESSLOGIC";
-	
-	private boolean hasNewPosition;
-	private boolean hasNewPoI;
 	
 	private Set<PoI> returnedList;
 	private Set<PoI> filteredList;
@@ -38,83 +37,32 @@ public class BusinessLogic extends Service{
 	
 	private BroadcastReceiver broadcastReceiver;
 	
-	private Position lastRequiredPosition;
-	private Position position;
+	private ContextInfo lastRequiredInfo;
+	private ContextInfo info;
 	
 	private StrategyFilterResults filter;
 	
 	private StrategyRetrievePoI retrievePoI;
 	
+	private StatusDetector statusDetector;
+	
 	//FIXME metodo da cancellare quando il sistema sarà completamente up
 	public void getPoIList(){
 		//TODO utilizza il parser per andare a recuperare la lista completa dal file xml statico
-		returnedList=retrievePoI.getPoISet(position.getLat(),position.getLng());
+		returnedList=retrievePoI.getPoISet(info.getLat(),info.getLng());
 		
 	}
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		positionUpdateInterval=Setting.POSITION_SAMPLE_INTERVAL;
+		positionUpdateInterval=Setting.POSITION_SAMPLE_INTERVAL_MS;
+		
 		delay=0;
 		
 		retrievePoI=new RetrieveWikipediaPoI();
 		
-		broadcastReceiver = new BroadcastReceiver() {
-			
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				hasNewPosition=false;
-				hasNewPoI=false;
-				if (intent.getAction().equals(MapsContextMonitor.CONTEXT_UPDATE)) {
-					//TODO Logica per andare a recuperare la lista dei PoI da AppCommVar
-				}
-				else if(intent.getAction().equals(MapsContextMonitor.POSITION_UPDATE)){
-					
-					//FIXME Aggiornamento della lista da presentare (non ci sarà con il server su)
-					Bundle extras = intent.getExtras();
-					if(extras!= null){
-						position=(Position)extras.get(AppDictionary.POSITION);
-						
-        				/*position.setLat(Float.parseFloat(extras.getString(AppDictionary.LAT)));
-        				position.setLng(Float.parseFloat(extras.getString(AppDictionary.LNG)));
-        				position.setBearing(Float.parseFloat(extras.getString(AppDictionary.BEARING)));
-        				position.setTilt(Integer.parseInt(extras.getString(AppDictionary.TILT)));
-        				position.setZoom(Float.parseFloat(extras.getString(AppDictionary.ZOOM)));
-        				position.setMotionState(extras.getString(AppDictionary.MOTION_STATE));*/
-        				
-						//FIXME da commentare quando il server sarà su
-						//controllo per verificare che non ci si è allontanati più di x-Km dal luogo in cui si è fatta richiesta dei poi l'ultima volta
-						//se non si è mai scaricata la lista dei poi e se mi sono allontanato troppo la scarico
-						if(lastRequiredPosition==null){
-							if(position!=null){
-							getPoIList();
-							lastRequiredPosition=position;
-							}
-						}
-						else if(DistanceBetweenCoords.CalculateDistance(lastRequiredPosition.getLat(), lastRequiredPosition.getLng(), position.getLat(), position.getLng())>=Setting.MAXKM){
-							getPoIList();
-							lastRequiredPosition=position;
-						}
-        				
-						//applica il filtro appropriato alla lista completa per verificare la presenza di nuovi PoI nel raggio interessante per l'applicazione
-        				if(!returnedList.isEmpty()){
-	        				if(position.getMotionState()==AppDictionary.STR_OUTPUT_MOTION_CAR)
-	        					filter=new FilterInAuto();
-	        			
-	        				else
-	        					filter=new FilterByFoot();
-
-	        				filteredList=filter.getFilteredList(returnedList,position.getLat(),position.getLng());
-        				}
-        				IntentHelper.addObjectForKey(AppDictionary.POSITION, position);
-        				hasNewPosition=true;
-        				
-					}
-				}
-			}
-			
-		};
+		statusDetector =  StatusDetector.getInstance(this);
 	}
 
 	@Override
@@ -125,29 +73,63 @@ public class BusinessLogic extends Service{
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		statusDetector.startMonitoring();
+		
 		TimerTask task=new TimerTask(){
 		
-			Intent b_intent = new Intent(BUSINESSLOGIC);
+			Intent intent = new Intent(BUSINESSLOGIC);
+			StatoContesto statoContesto;
 
 			@Override
 			public void run() {
-				if(hasNewPosition){
-					b_intent.putExtra(AppDictionary.POSITION, hasNewPosition);
-					sendBroadcast(b_intent);
-					hasNewPosition=false;
-				}
-				if(hasNewPoI){
-					b_intent.putExtra(AppDictionary.POI, hasNewPoI);
-					sendBroadcast(b_intent);
-					hasNewPoI=false;
-				}
+				statoContesto = statusDetector.calcolaStatoContesto();
 				
+				info.setLat(statoContesto.getLatitudine());
+				info.setLng(statoContesto.getLongitudine());
+				info.setBearing(statoContesto.getBearing());
+				info.setIdMotionState(statoContesto.getId_stato_moto());
+				info.setLocationProvider(statusDetector.getLocationProvider());
+				info.setGpsStatus(statusDetector.getGpsStatus());
+				//FIXME da commentare quando il server sarà su
+				//controllo per verificare che non ci si è allontanati più di x-Km dal luogo in cui si è fatta richiesta dei poi l'ultima volta
+				//se non si è mai scaricata la lista dei poi e se mi sono allontanato troppo la scarico
+				if(lastRequiredInfo==null){
+					if(info!=null){
+						getPoIList();
+						lastRequiredInfo=info;
+					}
+				}
+				else if(DistanceBetweenCoords.CalculateDistance(lastRequiredInfo.getLat(), lastRequiredInfo.getLng(), info.getLat(), info.getLng())>=Setting.MAXKM){
+					getPoIList();
+					lastRequiredInfo=info;
+				}
+        				
+				//applica il filtro appropriato alla lista completa per verificare la presenza di nuovi PoI nel raggio interessante per l'applicazione
+        		if(!returnedList.isEmpty()){
+	        		if(statoContesto.getId_stato_moto()==AppDictionary.MOTION_CAR)
+	        			filter=new FilterInAuto();
+	        			
+	        		else
+	        			filter=new FilterByFoot();
+
+	        		filteredList=filter.getFilteredList(returnedList,info.getLat(),info.getLng());
+	        				
+	        		IntentHelper.addObjectForKey(AppDictionary.POI, filteredList);
+	        		intent.putExtra(AppDictionary.POI, true);
+	        		sendBroadcast(intent);
+        		}
+        				
+        		if(info!=null){
+	        		IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
+	        		intent.putExtra(AppDictionary.CONTEXT_INFO, true);
+					sendBroadcast(intent);
+        		}
 			}
 		};
 		timer = new Timer();
 		
 		if(positionUpdateInterval<=0) 
-			positionUpdateInterval = Setting.POSITION_SAMPLE_INTERVAL;
+			positionUpdateInterval = Setting.POSITION_SAMPLE_INTERVAL_MS;
 		if(delay<0)
 			delay=0;
 		

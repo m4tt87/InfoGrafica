@@ -179,7 +179,7 @@ public class ContextMonitorService extends Service {
 					//se has_nuovi_elementi = TRUE allora vuol dire che ci sono nuovi eventi e/o servizi da proporre
 					b_intent.putExtra("has_nuovi_elementi", has_nuovi_elementi);
 					
-					b_intent.putExtra(AppDictionary.LOCATION_PROVIDER,_statusDetector.getLoactionProvider());		//String
+					b_intent.putExtra(AppDictionary.LOCATION_PROVIDER,_statusDetector.getLocationProvider());		//String
 					b_intent.putExtra(AppDictionary.GPS_STATUS,_statusDetector.getGpsStatus());		//float
 					b_intent.putExtra(AppDictionary.MOTION_STATE,_statoContesto.getId_stato_moto());		//int
 					b_intent.putExtra(AppDictionary.DEVICE_STATE,_statoContesto.getStato_device()); 	//int

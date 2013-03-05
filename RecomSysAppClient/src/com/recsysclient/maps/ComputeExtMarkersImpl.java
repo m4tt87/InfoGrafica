@@ -14,7 +14,7 @@ import com.recsysclient.maps.utils.ExternalMarker;
 import com.recsysclient.maps.utils.MapsLatLng;
 import com.recsysclient.maps.utils.MapsVisibleRegion;
 
-public class DoComputingExtMarkersImpl implements IDoComputingExternalStrategy {
+public class ComputeExtMarkersImpl implements IComputeExternalMarkersStrategy {
 
 	// vector[0] angular coefficient, vector[1] offset 
 	private double[] rightEdge;
@@ -23,8 +23,8 @@ public class DoComputingExtMarkersImpl implements IDoComputingExternalStrategy {
 	private double[] diagonal2;// nearRight-farLeft
 	
 	@Override
-	public Map<Integer, List<ExternalMarker>> doComputingExternalMarkers(Set<PoI> pois,
-			MapsVisibleRegion region, float bearing) {
+	public Map<Integer, List<ExternalMarker>> computeExternalMarkers(Set<PoI> pois,
+			MapsVisibleRegion region, double bearing) {
 
 		double[] translation = computeTranslationVector(region);
 		
@@ -68,7 +68,7 @@ public class DoComputingExtMarkersImpl implements IDoComputingExternalStrategy {
 				} else {//sotto
 					double intersecX = (coords.latitude/coords.longitude)*region.nearLeft.latitude;
 					float position = distance2(region.nearLeft, new MapsLatLng(region.nearLeft.latitude,intersecX))/bottomEdgeLength;
-					externalMarkers.get(1).add( new ExternalMarker(p,position));
+					externalMarkers.get(3).add( new ExternalMarker(p,position));
 				}
 			}
 		}
@@ -106,15 +106,15 @@ public class DoComputingExtMarkersImpl implements IDoComputingExternalStrategy {
 		return false;
 	}
 
-	private MapsVisibleRegion applyTransformationToRegion( MapsVisibleRegion region, float rotationAngle, double[] translation ){
-		region.farLeft = applyTransformation( region.farLeft, rotationAngle, translation );
-		region.farRight = applyTransformation( region.farRight, rotationAngle, translation );
-		region.nearLeft = applyTransformation( region.nearLeft, rotationAngle, translation );
-		region.nearRight = applyTransformation( region.nearRight, rotationAngle, translation );
+	private MapsVisibleRegion applyTransformationToRegion( MapsVisibleRegion region, double bearing, double[] translation ){
+		region.farLeft = applyTransformation( region.farLeft, bearing, translation );
+		region.farRight = applyTransformation( region.farRight, bearing, translation );
+		region.nearLeft = applyTransformation( region.nearLeft, bearing, translation );
+		region.nearRight = applyTransformation( region.nearRight, bearing, translation );
 		return region;	
 	}
 	
-	private MapsLatLng applyTransformation( MapsLatLng coords, float rotationAngle, double[] translation ){
+	private MapsLatLng applyTransformation( MapsLatLng coords, double rotationAngle, double[] translation ){
 		coords.latitude = coords.latitude+translation[0];
 		coords.longitude = coords.longitude+translation[1];
 

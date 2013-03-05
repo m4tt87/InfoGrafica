@@ -8,8 +8,8 @@ import com.recsysclient.entity.PoI;
 import com.recsysclient.maps.utils.ExternalMarker;
 import com.recsysclient.maps.utils.MapsVisibleRegion;
 
-public interface IDoComputingExternalStrategy {
+public interface IComputeExternalMarkersStrategy {
 
-	public Map<Integer, List<ExternalMarker>> doComputingExternalMarkers(Set<PoI> pois, MapsVisibleRegion region, float bearing);
+	public Map<Integer, List<ExternalMarker>> computeExternalMarkers(Set<PoI> pois, MapsVisibleRegion region, double d);
 
 }
