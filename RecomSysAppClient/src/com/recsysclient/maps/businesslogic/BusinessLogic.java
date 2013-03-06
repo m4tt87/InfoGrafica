@@ -6,17 +6,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.recsysclient.entity.ContextInfo;
 import com.recsysclient.entity.PoI;
 import com.recsysclient.entity.StatoContesto;
-import com.recsysclient.maps.MapsContextMonitor;
 import com.recsysclient.service.StatusDetector;
 import com.recsysclient.utility.AppDictionary;
 import com.recsysclient.utility.DistanceBetweenCoords;
