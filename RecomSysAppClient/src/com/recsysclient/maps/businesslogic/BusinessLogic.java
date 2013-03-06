@@ -94,6 +94,9 @@ public class BusinessLogic extends Service{
 				info.setIdMotionState(statoContesto.getId_stato_moto());
 				info.setLocationProvider(statusDetector.getLocationProvider());
 				info.setGpsStatus(statusDetector.getGpsStatus());
+				if((info.getLat()==-1 && info.getLng()==-1 && statoContesto.getAltitudine()==-1)||statoContesto.getAccuratezza()>=200)
+						info.setAvailable(false);
+				else info.setAvailable(true);
 				//FIXME da commentare quando il server sarà su
 				//controllo per verificare che non ci si è allontanati più di x-Km dal luogo in cui si è fatta richiesta dei poi l'ultima volta
 				//se non si è mai scaricata la lista dei poi e se mi sono allontanato troppo la scarico

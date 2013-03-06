@@ -7,6 +7,8 @@ public class ContextInfo {
 	private int idMotionState;
 	private String locationProvider;
 	private float gpsStatus;
+	private boolean available;
+	
 	public float getLat() {
 		return lat;
 	}
@@ -42,6 +44,12 @@ public class ContextInfo {
 	}
 	public void setGpsStatus(float gpsStatus) {
 		this.gpsStatus = gpsStatus;
+	}
+	public boolean isAvailable() {
+		return available;
+	}
+	public void setAvailable(boolean available) {
+		this.available = available;
 	}
 	
 }
