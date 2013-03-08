@@ -21,5 +21,13 @@ public interface Setting {
 	
 	static final int MAXKM=15;
 	
+	static final String BASEURL="http://api.geonames.org/findNearbyWikipediaJSON?username=m4tt&lang=it";
+	
+	static final String RADIUSSTRING="&radius=";
+	static final int RADIUS = 10;
+	
+	static final String MAXROWSSTRING="&maxrows=";
+	static final int MAXROWS = 500;
+	
 	
 }
