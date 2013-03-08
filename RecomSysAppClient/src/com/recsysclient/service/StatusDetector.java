@@ -309,8 +309,9 @@ public class StatusDetector {
 	//Calcola lo stato del contesto
 	public StatoContesto calcolaStatoContesto() {
 		if(_samplesWindow != null){
-			
-			return _samplesWindow.calcolaStatoContestoPercepetron();
+			synchronized(_samplesWindow){
+				return _samplesWindow.calcolaStatoContestoPercepetron();
+			}
 		}
 		Log.e("StatusDetector", "calcolaStatoContesto: ERRORE! _samplesWindow = null");
 		return null;

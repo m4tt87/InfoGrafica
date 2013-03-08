@@ -50,6 +50,7 @@ import com.recsysclient.entity.PoI;
 import com.recsysclient.maps.businesslogic.BusinessLogic;
 import com.recsysclient.maps.utils.ExternalMarker;
 import com.recsysclient.maps.utils.MapsVisibleRegion;
+import com.recsysclient.service.ContextMonitorService;
 import com.recsysclient.utility.AppDictionary;
 import com.recsysclient.utility.IntentHelper;
 
@@ -82,6 +83,7 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 		Intent intent = new Intent(this,BusinessLogic.class);
     	startService(intent);
     	Log.d("MapsAct","Dovrei aver Startato la logica!");
+    	strategy= new ComputeExtMarkersImpl();
 		
     	markers = new HashMap<Long,Marker>(0);
 		pois = new HashSet<PoI>(0);
@@ -95,10 +97,15 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 				if (intent.getAction().equals(BusinessLogic.BUSINESSLOGIC)) {
 					if( extras.getBoolean(AppDictionary.CONTEXT_INFO) ){
 						currentContextInfo=(ContextInfo)IntentHelper.getObjectForKey(AppDictionary.CONTEXT_INFO);
-						changeCamera( CameraUpdateFactory.newCameraPosition(getCameraPosition()) );
-						MapsVisibleRegion region= new MapsVisibleRegion(mMap.getProjection().getVisibleRegion());
-						externalMarkers = strategy.computeExternalMarkers( pois, region, currentContextInfo.getBearing());
-						drawExternalMarkers();
+						if(currentContextInfo.isLocalizationAvailable()){
+							changeCamera( CameraUpdateFactory.newCameraPosition(getCameraPosition()) );
+							MapsVisibleRegion region= new MapsVisibleRegion(mMap.getProjection().getVisibleRegion());
+							externalMarkers = strategy.computeExternalMarkers( pois, region, currentContextInfo.getBearing());
+							drawExternalMarkers();
+						}
+						else{
+						//TODO: cosa faccio altrimenti?
+						}
 					}
 					if( extras.getBoolean(AppDictionary.POI) ){
 
@@ -327,10 +334,12 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 		switch(currentContextInfo.getIdMotionState()){
 		case AppDictionary.MOTION_CAR:
 		case AppDictionary.MOTION_STILL_CAR:
+			Log.w("maps","car");
 			zoom=10f;
 			break;
 		default:
-			zoom=15f;			
+			zoom=15f;
+			Log.w("maps","default");
 		}
 		return new CameraPosition.Builder().target( new LatLng(currentContextInfo.getLat(),currentContextInfo.getLng()))
 				.zoom(zoom)
@@ -343,6 +352,7 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(broadcastReceiver);
-
+		Intent intent = new Intent(this,BusinessLogic.class);				
+		stopService(intent);
 	}
 }

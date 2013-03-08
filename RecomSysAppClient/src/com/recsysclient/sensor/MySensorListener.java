@@ -1,6 +1,7 @@
 package com.recsysclient.sensor;
 
 import java.util.Hashtable;
+import java.util.List;
 
 import com.recsysclient.entity.Valore;
 import com.recsysclient.entity.ValoreDecimale;
@@ -60,65 +61,79 @@ public class MySensorListener implements SensorEventListener {
 			
 			//Istanzio i Valori
 			
-			Sensor sensor = _sensorManager.getSensorList(Sensor.TYPE_LINEAR_ACCELERATION).get(0);
-			if(sensor != null){
-				//registro il listener relativo sensore
-				_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
-				_valore_accelerazione_lineare = new ValoreVettore();
-				_valore_accelerazione_lineare.setValore(getInitialArray());
-				_table_valori_sensori.put(AppDictionary.KEY_LINEAR_ACCELEROMETER_SENSOR, _valore_accelerazione_lineare);
+			Sensor sensor;
+			List<Sensor> sensorList = _sensorManager.getSensorList(Sensor.TYPE_LINEAR_ACCELERATION);
+			if(sensorList.size()!=0){
+				sensor = sensorList.get(0);
+			
+				if(sensor != null){
+					//registro il listener relativo sensore
+					_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
+					_valore_accelerazione_lineare = new ValoreVettore();
+					_valore_accelerazione_lineare.setValore(getInitialArray());
+					_table_valori_sensori.put(AppDictionary.KEY_LINEAR_ACCELEROMETER_SENSOR, _valore_accelerazione_lineare);
+				}
 			}
 			
-			
-			sensor = _sensorManager.getSensorList(Sensor.TYPE_ORIENTATION).get(0);
-			if(sensor != null){
-				//registro il listener relativo sensore
-				_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
-				_valore_orientamento = new ValoreVettore();
-				_valore_orientamento.setValore(getInitialArray());
-				_table_valori_sensori.put(AppDictionary.KEY_ORIENTATION_SENSOR, _valore_orientamento);
+			sensorList=_sensorManager.getSensorList(Sensor.TYPE_ORIENTATION);
+			if(sensorList.size()!=0){
+				sensor = sensorList.get(0);
+				if(sensor != null){
+					//registro il listener relativo sensore
+					_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
+					_valore_orientamento = new ValoreVettore();
+					_valore_orientamento.setValore(getInitialArray());
+					_table_valori_sensori.put(AppDictionary.KEY_ORIENTATION_SENSOR, _valore_orientamento);
+				}
 			}
 			
-			
-			sensor = _sensorManager.getSensorList(Sensor.TYPE_LIGHT).get(0);
-			if(sensor != null){
-				//registro il listener relativo sensore
-				_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
-				_valore_luminosita = new ValoreVettore();
-				_valore_luminosita.setValore(getInitialArray());
-				_table_valori_sensori.put(AppDictionary.KEY_LIGHT_SENSOR, _valore_luminosita);
+			sensorList=_sensorManager.getSensorList(Sensor.TYPE_LIGHT);
+			if(sensorList.size()!=0){
+				sensor = sensorList.get(0);
+				if(sensor != null){
+					//registro il listener relativo sensore
+					_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
+					_valore_luminosita = new ValoreVettore();
+					_valore_luminosita.setValore(getInitialArray());
+					_table_valori_sensori.put(AppDictionary.KEY_LIGHT_SENSOR, _valore_luminosita);
+				}
 			}
+			
+			sensorList=_sensorManager.getSensorList(Sensor.TYPE_PROXIMITY);
+			if(sensorList.size()!=0){
+				sensor = sensorList.get(0);
+				if(sensor != null){
+					//registro il listener relativo sensore
+					_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
+					_valore_prossimita = new ValoreVettore();
+					_valore_prossimita.setValore(getInitialArray());
+					_table_valori_sensori.put(AppDictionary.KEY_PROXYMITY_SENSOR, _valore_prossimita);
+				}
+			}
+			
+			sensorList=_sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE);
+			if(sensorList.size()!=0){
+				sensor =sensorList.get(0);
+				if(sensor != null){
+					//registro il listener relativo sensore
+					_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
+					_valore_giroscopio = new ValoreVettore();
+					_valore_giroscopio.setValore(getInitialArray());
+					_table_valori_sensori.put(AppDictionary.KEY_GYROSCOPE_SENSOR, _valore_giroscopio);
+				}
+			
+				_somma_acc_lin = new ValoreDecimale();
+				_somma_acc_lin.setValore(0);
+				_table_valori_sensori.put(AppDictionary.KEY_LIN_ACC_SUM, _somma_acc_lin);
+	
+				_somma_giroscopio = new ValoreDecimale();
+				_somma_giroscopio.setValore(0);
+				_table_valori_sensori.put(AppDictionary.KEY_GYROSCOPE_SUM, _somma_giroscopio);
 				
-			sensor = _sensorManager.getSensorList(Sensor.TYPE_PROXIMITY).get(0);
-			if(sensor != null){
-				//registro il listener relativo sensore
-				_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
-				_valore_prossimita = new ValoreVettore();
-				_valore_prossimita.setValore(getInitialArray());
-				_table_valori_sensori.put(AppDictionary.KEY_PROXYMITY_SENSOR, _valore_prossimita);
+				_modulo_acc_lin = new ValoreDecimale();
+				_modulo_acc_lin.setValore(0);
+				_table_valori_sensori.put(AppDictionary.KEY_LIN_ACC_MODULE, _modulo_acc_lin);
 			}
-			
-			sensor = _sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE).get(0);
-			if(sensor != null){
-				//registro il listener relativo sensore
-				_sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_NORMAL);
-				_valore_giroscopio = new ValoreVettore();
-				_valore_giroscopio.setValore(getInitialArray());
-				_table_valori_sensori.put(AppDictionary.KEY_GYROSCOPE_SENSOR, _valore_giroscopio);
-			}
-			
-			_somma_acc_lin = new ValoreDecimale();
-			_somma_acc_lin.setValore(0);
-			_table_valori_sensori.put(AppDictionary.KEY_LIN_ACC_SUM, _somma_acc_lin);
-
-			_somma_giroscopio = new ValoreDecimale();
-			_somma_giroscopio.setValore(0);
-			_table_valori_sensori.put(AppDictionary.KEY_GYROSCOPE_SUM, _somma_giroscopio);
-			
-			_modulo_acc_lin = new ValoreDecimale();
-			_modulo_acc_lin.setValore(0);
-			_table_valori_sensori.put(AppDictionary.KEY_LIN_ACC_MODULE, _modulo_acc_lin);
-			
 			_isMySensorListener_registered = true;
 		}
 	}
@@ -179,12 +194,14 @@ public class MySensorListener implements SensorEventListener {
 			v = (ValoreVettore)_table_valori_sensori.get(AppDictionary.KEY_ORIENTATION_SENSOR);
 			v.setTimestamp(event_timestamp);
 			v.setValore(values.clone());
+			//debug
+			System.out.println("Il valore orientation è cambiato a: "+values[0]);
 			break;
-		case Sensor.TYPE_LIGHT:
+		/*case Sensor.TYPE_LIGHT:
 			v = (ValoreVettore)_table_valori_sensori.get(AppDictionary.KEY_LIGHT_SENSOR);
 			v.setTimestamp(event_timestamp);
 			v.setValore(values.clone());
-			break;
+			break;*/
 		case Sensor.TYPE_PROXIMITY:
 			v = (ValoreVettore)_table_valori_sensori.get(AppDictionary.KEY_PROXYMITY_SENSOR);
 			v.setTimestamp(event_timestamp);

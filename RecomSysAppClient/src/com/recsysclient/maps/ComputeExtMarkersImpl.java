@@ -1,5 +1,6 @@
 package com.recsysclient.maps;
 
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,6 +82,11 @@ public class ComputeExtMarkersImpl implements IComputeExternalMarkersStrategy {
 	}
 
 	private void setupLinesParameters(MapsVisibleRegion region) {
+		diagonal1 = new double[2];
+		diagonal2 = new double[2];
+		leftEdge = new double[2];
+		rightEdge = new double[2];
+		
 		diagonal1[0] = (region.nearLeft.latitude - region.farRight.latitude) / (region.nearLeft.longitude - region.farRight.longitude);
 		diagonal2[0] = (region.nearRight.latitude - region.farLeft.latitude) / (region.nearRight.longitude - region.farLeft.longitude);
 		diagonal1[1] = region.farRight.latitude - region.farRight.longitude * diagonal1[0];

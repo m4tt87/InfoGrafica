@@ -95,50 +95,102 @@ public class SamplesWindow{
 		//---- SENSOR -------------------------------------
 		if(sensor_table!=null){
 			v = (ValoreVettore) sensor_table.get(AppDictionary.KEY_LINEAR_ACCELEROMETER_SENSOR);
-			list_values_lin_acc.add(v.getValore());
+			if(v!=null)
+				list_values_lin_acc.add(v.getValore());
+			else{
+				float[] f={0f,0f,0f};
+				list_values_lin_acc.add(f);
+			}
 			
 			d = (ValoreDecimale) sensor_table.get(AppDictionary.KEY_LIN_ACC_SUM);
-			list_abs_sum_acc.add((float) d.getValore());
+			if(d!=null)
+				list_abs_sum_acc.add((float) d.getValore());
+			else{
+				list_abs_sum_acc.add(0f);
+			}
 			
 			v = (ValoreVettore) sensor_table.get(AppDictionary.KEY_GYROSCOPE_SENSOR);
-			list_values_gyroscope.add(v.getValore());
+			if(v!=null)
+				list_values_gyroscope.add(v.getValore());
+			else{
+				float[] f={0f,0f,0f};
+				list_values_gyroscope.add(f);
+			}
 			
 			d = (ValoreDecimale)sensor_table.get(AppDictionary.KEY_LIN_ACC_MODULE);
-			list_module_acc.add((float) d.getValore());
+			if(d!=null)
+				list_module_acc.add((float) d.getValore());
+			else{
+				list_module_acc.add(0f);
+			}
 			
 			d = (ValoreDecimale) sensor_table.get(AppDictionary.KEY_GYROSCOPE_SUM);
-			list_abs_sum_gyr.add((float) d.getValore());
+			if(d!=null)
+				list_abs_sum_gyr.add((float) d.getValore());
+			else{
+				list_abs_sum_gyr.add(0f);
+			}
 			
 			v = (ValoreVettore) sensor_table.get(AppDictionary.KEY_ORIENTATION_SENSOR); 
-			list_values_orientation.add(v.getValore());
+			if(v!=null)
+				list_values_orientation.add(v.getValore());
+			else{
+				float[] f={0f,0f,0f};
+				list_values_orientation.add(f);
+			}
 			
 			v = (ValoreVettore) sensor_table.get(AppDictionary.KEY_LIGHT_SENSOR); 
-			list_values_light.add(v.getValore());
+			if(v!=null)
+				list_values_light.add(v.getValore());
+			else{
+				float[] f={0f,0f,0f};
+				list_values_light.add(f);
+			}
 			
 			v = (ValoreVettore) sensor_table.get(AppDictionary.KEY_PROXYMITY_SENSOR); 
-			list_values_proximity.add(v.getValore());
+			if(v!=null)
+				list_values_proximity.add(v.getValore());
+			else{
+				float[] f={0f,0f,0f};
+				list_values_proximity.add(f);
+			}
 		}
 		
 		//---- LOCATION -------------------------------------
 		if(location_table!=null){	
 			v = (ValoreVettore) location_table.get(AppDictionary.KEY_LOCATION_COORD);
-			list_coordinate.add(v.getValore());
+			if(v!=null)
+				list_coordinate.add(v.getValore());
+			else{
+				float[] f={40.27f,18.05f,10f};
+				list_coordinate.add(f);
+			}
 			
 			d = (ValoreDecimale) location_table.get(AppDictionary.KEY_LOCATION_ACCURACY); 
-			list_accuracy.add((float) d.getValore());
+			if(d!=null)
+				list_accuracy.add((float) d.getValore());
+			else{
+				list_accuracy.add(0f);
+			}
 			
 			d = (ValoreDecimale) location_table.get(AppDictionary.KEY_LOCATION_SPEED); 
-			list_speed.add((float) d.getValore());	
+			if(d!=null)
+				list_speed.add((float) d.getValore());	
+			else{
+				list_speed.add(0f);
+			}
 		}
 		_gps_status = GPS_status;
 		
 		//---- DEVICE USE -----------------------------------
 		if(device_use_table!=null){
 			d = (ValoreDecimale) device_use_table.get(AppDictionary.KEY_DISPLAY_STATUS);
-			list_display_status.add((float) d.getValore());
-		}
-		
-		
+			if(d!=null)
+				list_display_status.add((float) d.getValore());
+			else{
+				list_display_status.add(0f);
+			}
+		}		
 		
 		if((size+1) > max_window_size){
 			
@@ -160,22 +212,25 @@ public class SamplesWindow{
 		}
 		else{
 			size++;
+			Log.d("Samples","New Size: "+size);
 		}
 	}
 	
-public StatoContesto calcolaStatoContestoPercepetron(){
+public synchronized StatoContesto calcolaStatoContestoPercepetron(){
 
 	
 	long time_start = System.currentTimeMillis()/1000; //TIME START
 	Log.i("SamplesWindow", "calcolaStatoContestoFisher: START:"+ time_start);
 	
+	List<Float> clonedList_module_acc = new ArrayList<Float>(list_module_acc);
+	int clonedSize=size;
 	
-	int last_index = size;
-	Log.d("samples", "Size:"+size);
+	int last_index = clonedSize;
+	Log.d("samples", "clonedSize:"+clonedSize);
 	last_index--;
 	printStatus(true);
-	Log.d("samples", "Size before if:"+size);
-	if(size>0){
+	Log.d("samples", "clonedSize before if:"+clonedSize);
+	if(clonedSize>0){
 		long timestamp = System.currentTimeMillis();
 		
 		float latitudine =  list_coordinate.get(last_index)[0];
@@ -193,10 +248,10 @@ public StatoContesto calcolaStatoContestoPercepetron(){
 			
 		
 		
-		max_mod_acc = list_module_acc.get(0);
-		min_mod_acc = list_module_acc.get(0);
-		avg_mod_acc = list_module_acc.get(0);
-		dev_std_acc = list_module_acc.get(0);
+		max_mod_acc = clonedList_module_acc.get(0);
+		min_mod_acc = clonedList_module_acc.get(0);
+		avg_mod_acc = clonedList_module_acc.get(0);
+		dev_std_acc = clonedList_module_acc.get(0);
 
 		//------------------------------------------
 		
@@ -206,9 +261,9 @@ public StatoContesto calcolaStatoContestoPercepetron(){
 		List<Float> lista_moduli_window = new ArrayList<Float>();
 		List<Double> bearingList = new ArrayList<Double>();
 		
-		for(int i=1; i < size; i++){
+		for(int i=1; i < clonedSize; i++){
 							
-			float valore_modulo_acc = list_module_acc.get(i);
+			float valore_modulo_acc = clonedList_module_acc.get(i);
 			
 			lista_moduli_window.add(valore_modulo_acc);
 			
@@ -227,14 +282,17 @@ public StatoContesto calcolaStatoContestoPercepetron(){
 		}
 		
 		//CALCOLO MEDIA BEARING
-		Outlier o = new Outlier(bearingList);
-		meanBearing= o.getMean();
+		if(bearingList!=null && bearingList.size()>0){
+			Outlier o = new Outlier(bearingList);
+			meanBearing= o.getMean();
+		}	
+		
 		
 		//CALCOLO DELLE MEDIE
-		avg_mod_acc/=size;
+		avg_mod_acc/=clonedSize;
 		
 		float somma_quadr = 0;
-		for(float mod_acc:list_module_acc){
+		for(float mod_acc:clonedList_module_acc){
 			float diff = (mod_acc-avg_mod_acc);
 			somma_quadr += (diff*diff);
 		}

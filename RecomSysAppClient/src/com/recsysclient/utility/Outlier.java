@@ -22,6 +22,8 @@ public class Outlier {
 	
 	public Outlier(List <Double> l){
 		list=l;
+		outlierList=new ArrayList<Double>();
+		purgedList=new ArrayList<Double>();
 		Collections.sort(list);
 		calcolaQuartili();
 		calcolaOutlier();

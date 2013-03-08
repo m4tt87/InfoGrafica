@@ -48,7 +48,9 @@ public class BusinessLogic extends Service{
 	//FIXME metodo da cancellare quando il sistema sarà completamente up
 	public void getPoIList(){
 		//TODO utilizza il parser per andare a recuperare la lista completa dal file xml statico
-		returnedList=retrievePoI.getPoISet(info.getLat(),info.getLng());
+		if(info.isLocalizationAvailable())
+			//returnedList=retrievePoI.getPoISet(info.getLat(),info.getLng());
+			returnedList=retrievePoI.getPoISet(40.27,18.05);
 		
 	}
 	
@@ -94,10 +96,14 @@ public class BusinessLogic extends Service{
 				info.setIdMotionState(statoContesto.getId_stato_moto());
 				info.setLocationProvider(statusDetector.getLocationProvider());
 				info.setGpsStatus(statusDetector.getGpsStatus());
+				//Log.w("BL","accuratezza: " + statoContesto.getAccuratezza());
+				if((info.getLat()==-1 && info.getLng()==-1 && statoContesto.getAltitudine()==-1))
+						info.setLocalizationAvailable(false);
+				else info.setLocalizationAvailable(true);
 				//FIXME da commentare quando il server sarà su
 				//controllo per verificare che non ci si è allontanati più di x-Km dal luogo in cui si è fatta richiesta dei poi l'ultima volta
 				//se non si è mai scaricata la lista dei poi e se mi sono allontanato troppo la scarico
-				if(lastRequiredInfo==null){
+				if(lastRequiredInfo==null || (info.isLocalizationAvailable() && !lastRequiredInfo.isLocalizationAvailable())){
 					if(info!=null){
 						getPoIList();
 						lastRequiredInfo=info;
@@ -109,7 +115,7 @@ public class BusinessLogic extends Service{
 				}
         				
 				//applica il filtro appropriato alla lista completa per verificare la presenza di nuovi PoI nel raggio interessante per l'applicazione
-        		if(!returnedList.isEmpty()){
+        		if(returnedList!=null &&!returnedList.isEmpty()){
 	        		if(statoContesto.getId_stato_moto()==AppDictionary.MOTION_CAR)
 	        			filter=new FilterInAuto();
 	        			
@@ -117,15 +123,19 @@ public class BusinessLogic extends Service{
 	        			filter=new FilterByFoot();
 
 	        		filteredList=filter.getFilteredList(returnedList,info.getLat(),info.getLng());
-	        				
+	        		
+	        		for(PoI p: filteredList){
+	        			Log.w("BL",p.toString());
+	        		}
+	        		
 	        		IntentHelper.addObjectForKey(AppDictionary.POI, filteredList);
 	        		intent.putExtra(AppDictionary.POI, true);
 	        		Log.d("BL","Sent POI!");
 	        		sendBroadcast(intent);
         		}
         				
-        		if(info!=null){
-	        		IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
+        		if(info!=null && info.isLocalizationAvailable()){
+        			IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
 	        		intent.putExtra(AppDictionary.CONTEXT_INFO, true);
 	        		Log.d("BL","Sent Info!");
 					sendBroadcast(intent);
