@@ -87,7 +87,7 @@ public class SamplesWindow{
 		this.size=0;
 	}
 	
-	public void addSamplesTables(Hashtable<Integer, Valore> sensor_table, Hashtable<Integer, Valore> device_use_table, Hashtable<Integer, Valore> location_table, float GPS_status){
+	public synchronized void addSamplesTables(Hashtable<Integer, Valore> sensor_table, Hashtable<Integer, Valore> device_use_table, Hashtable<Integer, Valore> location_table, float GPS_status){
 		
 		ValoreVettore v;
 		ValoreDecimale d;
@@ -222,15 +222,12 @@ public synchronized StatoContesto calcolaStatoContestoPercepetron(){
 	long time_start = System.currentTimeMillis()/1000; //TIME START
 	Log.i("SamplesWindow", "calcolaStatoContestoFisher: START:"+ time_start);
 	
-	List<Float> clonedList_module_acc = new ArrayList<Float>(list_module_acc);
-	int clonedSize=size;
-	
-	int last_index = clonedSize;
-	Log.d("samples", "clonedSize:"+clonedSize);
+	int last_index = size;
+	Log.d("samples", "clonedSize:"+size);
 	last_index--;
-	printStatus(true);
-	Log.d("samples", "clonedSize before if:"+clonedSize);
-	if(clonedSize>0){
+	//printStatus(true);
+	Log.d("samples", "clonedSize before if:"+size);
+	if(size>0){
 		long timestamp = System.currentTimeMillis();
 		
 		float latitudine =  list_coordinate.get(last_index)[0];
@@ -248,10 +245,10 @@ public synchronized StatoContesto calcolaStatoContestoPercepetron(){
 			
 		
 		
-		max_mod_acc = clonedList_module_acc.get(0);
-		min_mod_acc = clonedList_module_acc.get(0);
-		avg_mod_acc = clonedList_module_acc.get(0);
-		dev_std_acc = clonedList_module_acc.get(0);
+		max_mod_acc = list_module_acc.get(0);
+		min_mod_acc = list_module_acc.get(0);
+		avg_mod_acc = list_module_acc.get(0);
+		dev_std_acc = list_module_acc.get(0);
 
 		//------------------------------------------
 		
@@ -261,9 +258,9 @@ public synchronized StatoContesto calcolaStatoContestoPercepetron(){
 		List<Float> lista_moduli_window = new ArrayList<Float>();
 		List<Double> bearingList = new ArrayList<Double>();
 		
-		for(int i=1; i < clonedSize; i++){
+		for(int i=1; i < size; i++){
 							
-			float valore_modulo_acc = clonedList_module_acc.get(i);
+			float valore_modulo_acc = list_module_acc.get(i);
 			
 			lista_moduli_window.add(valore_modulo_acc);
 			
@@ -289,10 +286,10 @@ public synchronized StatoContesto calcolaStatoContestoPercepetron(){
 		
 		
 		//CALCOLO DELLE MEDIE
-		avg_mod_acc/=clonedSize;
+		avg_mod_acc/=size;
 		
 		float somma_quadr = 0;
-		for(float mod_acc:clonedList_module_acc){
+		for(float mod_acc:list_module_acc){
 			float diff = (mod_acc-avg_mod_acc);
 			somma_quadr += (diff*diff);
 		}
@@ -435,7 +432,7 @@ public synchronized StatoContesto calcolaStatoContestoPercepetron(){
 		return false;
 	}
 	
-	
+	/*
 	//print status
 	public void printStatus(boolean onlyLastSampleElement) {
 
@@ -507,7 +504,7 @@ public synchronized StatoContesto calcolaStatoContestoPercepetron(){
 		
 		
 	}
-	
+	*/
 	public boolean sendContextStatus(){
 		Log.i("SamplesWindow", "printStatus: Sto per inviare il messaggio al server al Server");
 		

@@ -9,7 +9,7 @@ import com.recsysclient.utility.DistanceBetweenCoords;
 
 public class FilterInAuto implements StrategyFilterResults {
 	//TODO mettere il range letto da costante dichiarata da qualche parte (in Km)
-	private int fixedRange = 10;
+	private int fixedRange = 10000;
 	@Override
 	public Set<PoI> getFilteredList(Set<PoI> p, double currLat, double currLng) {
 		Set<PoI> filteredList= new HashSet<PoI>();
@@ -17,7 +17,8 @@ public class FilterInAuto implements StrategyFilterResults {
 		PoI instance;
 		while(i.hasNext()){
 			instance= i.next();
-			if(DistanceBetweenCoords.CalculateDistance(currLat,currLng,instance.getLat(),instance.getLng())<=fixedRange)
+			double d= DistanceBetweenCoords.CalculateDistance(currLat,currLng,instance.getLat(),instance.getLng());
+			if(d<=fixedRange)
 				filteredList.add(instance);
 		}
 		return filteredList;

@@ -25,9 +25,9 @@ public class IntentHelper {
     public static Object getObjectForKey(String key) {
         IntentHelper helper = getInstance();
         Object data = helper.hash.get(key);
-        helper.hash.remove(key);
+        /*helper.hash.remove(key);
         if(helper.hash.isEmpty())
-        	helper = null;
+        	helper = null;*/
         return data;
     }
 }

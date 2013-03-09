@@ -32,7 +32,8 @@ public class RetrieveWikipediaPoI implements StrategyRetrievePoI{
 		Log.e("retri", "get");
 		Set<PoI> poiSet = new HashSet<PoI>();
 
-		String url=Setting.BASEURL+Setting.RADIUSSTRING+Setting.RADIUS+Setting.MAXROWSSTRING+Setting.MAXROWS;
+		String url=Setting.BASEURL+Setting.RADIUSSTRING+Setting.RADIUS+Setting.MAXROWSSTRING+Setting.MAXROWS+Setting.LATSTRING+lat+Setting.LNGSTRING+lng;
+		Log.w("RetrievveUrl", url);
 		if(sentRequest==false){
 			Connection conn= new Connection();
 			String response="";
@@ -57,8 +58,13 @@ public class RetrieveWikipediaPoI implements StrategyRetrievePoI{
 				Gson gson = new Gson();
 				PoISet ps = gson.fromJson(response, PoISet.class); 
 				poiSet=ps.getPoiSet();
+				
 				t1=System.currentTimeMillis()-t1;
 				System.out.println("Tempo di conversione in PoISet= "+t1);
+				
+				if(poiSet==null || poiSet.size()==0){
+					return null;
+				}
 				
 				t1=System.currentTimeMillis();
 				

@@ -9,7 +9,7 @@ import com.recsysclient.utility.DistanceBetweenCoords;
 
 public class FilterByFoot implements StrategyFilterResults {
 	//TODO mettere il range letto da costante dichiarata da qualche parte (in Km)
-	private int fixedRange = 2;
+	private int fixedRange = 2000;
 	@Override
 	public Set<PoI> getFilteredList(Set<PoI> p, double currLat, double currLng) {
 		Set<PoI> filteredList= new HashSet<PoI>();

@@ -36,6 +36,7 @@ public class BusinessLogic extends Service{
 	//ritardo prima della lettura (in genere = 0)
 	private int delay;
 	Timer timer;
+	private boolean retrieved;
 	
 	private ContextInfo lastRequiredInfo;
 	private ContextInfo info;
@@ -49,25 +50,26 @@ public class BusinessLogic extends Service{
 	//FIXME metodo da cancellare quando il sistema sarà completamente up
 	public void getPoIList(){
 		//TODO utilizza il parser per andare a recuperare la lista completa dal file xml statico
-		if(info.isLocalizationAvailable())
-			//returnedList=retrievePoI.getPoISet(info.getLat(),info.getLng());
-			returnedList=retrievePoI.getPoISet(40.27,18.05);
-		
+		if(info.isLocalizationAvailable()){
+			Set<PoI> retrievedList = retrievePoI.getPoISet(info.getLat(),info.getLng());
+			if(retrievedList!=null)
+				returnedList=retrievedList;
+			//returnedList=retrievePoI.getPoISet(40.27,18.05);
+			if( returnedList!=null && !returnedList.isEmpty())
+				retrieved=true;
+		}
 	}
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d("BL","Creo!");
 		
 		positionUpdateInterval=Setting.POSITION_SAMPLE_INTERVAL_MS;
-		
+		retrieved=false;
 		delay=0;
 		info = new ContextInfo();
 		retrievePoI=new RetrieveWikipediaPoI();
-		
 		statusDetector =  StatusDetector.getInstance(this);
-		Log.d("BL","Ho Creato!");
 	}
 
 	@Override
@@ -78,17 +80,14 @@ public class BusinessLogic extends Service{
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d("BL","Started!");
 		statusDetector.startMonitoring();
 		
 		TimerTask task=new TimerTask(){
-		
 			Intent intent = new Intent(BUSINESSLOGIC);
 			StatoContesto statoContesto;
 
 			@Override
 			public void run() {
-				Log.d("BL","Runned!");
 				statoContesto = statusDetector.calcolaStatoContesto();
 				
 				info.setLat(statoContesto.getLatitudine());
@@ -104,13 +103,12 @@ public class BusinessLogic extends Service{
 				//FIXME da commentare quando il server sarà su
 				//controllo per verificare che non ci si è allontanati più di x-Km dal luogo in cui si è fatta richiesta dei poi l'ultima volta
 				//se non si è mai scaricata la lista dei poi e se mi sono allontanato troppo la scarico
-				if(lastRequiredInfo==null || (info.isLocalizationAvailable() && !lastRequiredInfo.isLocalizationAvailable())){
-					if(info!=null){
-						getPoIList();
-						lastRequiredInfo=info;
-					}
+								
+				if(lastRequiredInfo==null ){
+					getPoIList();
+					lastRequiredInfo=info;
 				}
-				else if(DistanceBetweenCoords.CalculateDistance(lastRequiredInfo.getLat(), lastRequiredInfo.getLng(), info.getLat(), info.getLng())>=Setting.MAXKM){
+				else if( retrieved==false || DistanceBetweenCoords.CalculateDistance(lastRequiredInfo.getLat(), lastRequiredInfo.getLng(), info.getLat(), info.getLng())>=Setting.MAXKM){
 					getPoIList();
 					lastRequiredInfo=info;
 				}
@@ -123,7 +121,7 @@ public class BusinessLogic extends Service{
 	        		else
 	        			filter=new FilterByFoot();
 
-	        		filteredList=filter.getFilteredList(new HashSet<PoI>(returnedList),info.getLat(),info.getLng());
+	        		filteredList=filter.getFilteredList(returnedList,info.getLat(),info.getLng());
 	        		
 	        		for(PoI p: filteredList){
 	        			Log.w("BL",p.toString());
@@ -131,15 +129,14 @@ public class BusinessLogic extends Service{
 	        		
 	        		IntentHelper.addObjectForKey(AppDictionary.POI, filteredList);
 	        		intent.putExtra(AppDictionary.POI, true);
-	        		Log.d("BL","Sent POI!");
+	        		Log.w("BL","Sent POI!");
 	        		sendBroadcast(intent);
         		}
         				
         		if(info!=null && info.isLocalizationAvailable()){
         			IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
 	        		intent.putExtra(AppDictionary.CONTEXT_INFO, true);
-	        		Log.d("BL","Sent Info!");
-					sendBroadcast(intent);
+	        		sendBroadcast(intent);
         		}
 			}
 		};

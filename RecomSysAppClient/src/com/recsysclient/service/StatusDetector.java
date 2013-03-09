@@ -322,7 +322,7 @@ public class StatusDetector {
 		boolean has_nuoviElementi = false;
 		if(_samplesWindow != null){
 			
-			_samplesWindow.printStatus(true);
+			//_samplesWindow.printStatus(true);
 			if(msg_server_attivi){
 				has_nuoviElementi =  _samplesWindow.sendContextStatus();
 				Log.i("StatusDetector", " -----> sendNewRequest: nuovi elementi?"+has_nuoviElementi);

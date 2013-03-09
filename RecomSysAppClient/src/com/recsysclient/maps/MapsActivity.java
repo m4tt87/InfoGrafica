@@ -92,7 +92,7 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				//if cambio posizione
-				Log.d("MapAct", "received");
+				//Log.w("MapAct", "received");
 				Bundle extras = intent.getExtras();
 				if (intent.getAction().equals(BusinessLogic.BUSINESSLOGIC)) {
 					if( extras.getBoolean(AppDictionary.CONTEXT_INFO) ){
@@ -139,9 +139,9 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 
 		for( PoI p : pois ){
 			if( !markers.containsKey(p.getId()) ){
-				BitmapDescriptor icon=BitmapDescriptorFactory.fromFile("res/drawable/"+p.getFeature()+"_icon.png");
-				if( icon==null)
-					icon=BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+				/*BitmapDescriptor icon=BitmapDescriptorFactory.fromFile("res/drawable/"+p.getFeature()+"_icon.png");
+				if( icon==null)*/
+				BitmapDescriptor icon=BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
 
 				Marker marker = mMap.addMarker(new MarkerOptions()
 				.position(new LatLng( p.getLat(), p.getLng()))
@@ -334,12 +334,12 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 		switch(currentContextInfo.getIdMotionState()){
 		case AppDictionary.MOTION_CAR:
 		case AppDictionary.MOTION_STILL_CAR:
-			Log.w("maps","car");
+			//Log.w("maps","car");
 			zoom=10f;
 			break;
 		default:
 			zoom=15f;
-			Log.w("maps","default");
+			//Log.w("maps","default");
 		}
 		return new CameraPosition.Builder().target( new LatLng(currentContextInfo.getLat(),currentContextInfo.getLng()))
 				.zoom(zoom)
