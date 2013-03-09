@@ -53,7 +53,7 @@ public class BusinessLogic extends Service{
 		if(info.isLocalizationAvailable()){
 			Set<PoI> retrievedList = retrievePoI.getPoISet(info.getLat(),info.getLng());
 			if(retrievedList!=null)
-				returnedList=retrievedList;
+				returnedList = new HashSet<PoI>(retrievedList);
 			//returnedList=retrievePoI.getPoISet(40.27,18.05);
 			if( returnedList!=null && !returnedList.isEmpty())
 				retrieved=true;

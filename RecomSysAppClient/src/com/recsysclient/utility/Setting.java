@@ -4,7 +4,7 @@ package com.recsysclient.utility;
 public interface Setting {
 	
 	//intervallo di campionamento dei sensori, posizione, stato device [in millisecondi]
-	static final int SAMPLE_INTERVAL_MS = 50;
+	static final int SAMPLE_INTERVAL_MS = 10;
 	
 	//intervallo per il calcolo dello stato del contesto [in millisecondi]
 	static final int STATUS_DETECTING_INTERVAL_MS = 5000;
@@ -14,7 +14,7 @@ public interface Setting {
 	
 	//maps package util
 	//intervallo di aggiornamento della posizione
-	static final int POSITION_SAMPLE_INTERVAL_MS=300;
+	static final int POSITION_SAMPLE_INTERVAL_MS=200;
 	
 	//intervallo di richiesta nuovi POI
 	static final int REQUIRES_POI_INTERVAL=120000;
