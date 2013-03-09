@@ -1,6 +1,7 @@
 package com.recsysclient.maps.businesslogic;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -122,7 +123,7 @@ public class BusinessLogic extends Service{
 	        		else
 	        			filter=new FilterByFoot();
 
-	        		filteredList=filter.getFilteredList(returnedList,info.getLat(),info.getLng());
+	        		filteredList=filter.getFilteredList(new HashSet<PoI>(returnedList),info.getLat(),info.getLng());
 	        		
 	        		for(PoI p: filteredList){
 	        			Log.w("BL",p.toString());
