@@ -19,7 +19,7 @@ public interface Setting {
 	//intervallo di richiesta nuovi POI
 	static final int REQUIRES_POI_INTERVAL=120000;
 	
-	static final int MAXKM=15;
+	static final int MAXKM=6000;
 	
 	static final String BASEURL="http://api.geonames.org/findNearbyWikipediaJSON?username=m4tt&lang=it";
 	
@@ -31,5 +31,7 @@ public interface Setting {
 
 	static final String LATSTRING="&lat=";
 	static final String LNGSTRING="&lng=";
+	
+	static final float REQUIRED_ACCURACY=20f;
 	
 }
