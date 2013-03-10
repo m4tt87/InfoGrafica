@@ -162,6 +162,10 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		Log.d("Maps", "resume");
+		
+		/*IntentFilter filter = new IntentFilter();
+		filter.addAction(BusinessLogic.BUSINESSLOGIC);
+		registerReceiver(broadcastReceiver, filter);*/
 
 		setUpMapIfNeeded();
 	}
@@ -355,4 +359,12 @@ public class MapsActivity extends android.support.v4.app.FragmentActivity {
 		Intent intent = new Intent(this,BusinessLogic.class);				
 		stopService(intent);
 	}
+	
+	@Override 
+	protected void onPause(){
+		super.onPause();
+		//unregisterReceiver(broadcastReceiver);
+	}
+	
+	
 }
