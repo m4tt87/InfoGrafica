@@ -52,11 +52,11 @@ public class BusinessLogic extends Service{
 		//TODO utilizza il parser per andare a recuperare la lista completa dal file xml statico
 		if(info.isLocalizationAvailable()){
 			Set<PoI> retrievedList = retrievePoI.getPoISet(info.getLat(),info.getLng());
-			if(retrievedList!=null)
+			if(retrievedList!=null && !retrievedList.isEmpty()){
 				returnedList = new HashSet<PoI>(retrievedList);
-			//returnedList=retrievePoI.getPoISet(40.27,18.05);
-			if( returnedList!=null && !returnedList.isEmpty())
+				//returnedList=retrievePoI.getPoISet(40.27,18.05);
 				retrieved=true;
+			}
 		}
 	}
 	
@@ -90,54 +90,63 @@ public class BusinessLogic extends Service{
 			public void run() {
 				statoContesto = statusDetector.calcolaStatoContesto();
 				
-				info.setLat(statoContesto.getLatitudine());
-				info.setLng(statoContesto.getLongitudine());
-				info.setBearing(statoContesto.getBearing());
-				info.setIdMotionState(statoContesto.getId_stato_moto());
-				info.setLocationProvider(statusDetector.getLocationProvider());
-				info.setGpsStatus(statusDetector.getGpsStatus());
-				//Log.w("BL","accuratezza: " + statoContesto.getAccuratezza());
-				if((info.getLat()==-1 && info.getLng()==-1 && statoContesto.getAltitudine()==-1))
-						info.setLocalizationAvailable(false);
-				else info.setLocalizationAvailable(true);
-				//FIXME da commentare quando il server sarà su
-				//controllo per verificare che non ci si è allontanati più di x-Km dal luogo in cui si è fatta richiesta dei poi l'ultima volta
-				//se non si è mai scaricata la lista dei poi e se mi sono allontanato troppo la scarico
-								
-				if(lastRequiredInfo==null ){
-					getPoIList();
-					lastRequiredInfo=info;
-				}
-				else if( retrieved==false || DistanceBetweenCoords.CalculateDistance(lastRequiredInfo.getLat(), lastRequiredInfo.getLng(), info.getLat(), info.getLng())>=Setting.MAXKM){
-					getPoIList();
-					lastRequiredInfo=info;
-				}
-        				
-				//applica il filtro appropriato alla lista completa per verificare la presenza di nuovi PoI nel raggio interessante per l'applicazione
-        		if(returnedList!=null &&!returnedList.isEmpty()){
-	        		if(statoContesto.getId_stato_moto()==AppDictionary.MOTION_CAR)
-	        			filter=new FilterInAuto();
-	        			
-	        		else
-	        			filter=new FilterByFoot();
-
-	        		filteredList=filter.getFilteredList(returnedList,info.getLat(),info.getLng());
-	        		
-	        		for(PoI p: filteredList){
-	        			Log.w("BL",p.toString());
+				if(statoContesto!=null){
+					info.setLat(statoContesto.getLatitudine());
+					info.setLng(statoContesto.getLongitudine());
+					info.setBearing(statoContesto.getBearing());
+					info.setIdMotionState(statoContesto.getId_stato_moto());
+					info.setLocationProvider(statusDetector.getLocationProvider());
+					info.setGpsStatus(statusDetector.getGpsStatus());
+					//Log.w("BL","accuratezza: " + statoContesto.getAccuratezza());
+					
+					//determinazione dell'esistenza di una localizzazione, anche se poco accurata
+					if((info.getLat()==-1 && info.getLng()==-1 && statoContesto.getAltitudine()==-1) || statoContesto.getAccuratezza()<Setting.REQUIRED_ACCURACY){
+							info.setLocalizationAvailable(false);
+							Log.w("BL","info.isLocalizationAvailable=FALSE");
+					}
+					else info.setLocalizationAvailable(true);
+					//FIXME da commentare quando il server sarà su
+					//controllo per verificare che non ci si è allontanati più di x-Km dal luogo in cui si è fatta richiesta dei poi l'ultima volta
+					//se non si è mai scaricata la lista dei poi e se mi sono allontanato troppo la scarico
+					
+					
+					//recupero dei punti di interesse
+					if(lastRequiredInfo==null ){
+						getPoIList();
+						lastRequiredInfo=info;
+					}
+					else if( retrieved==false || DistanceBetweenCoords.CalculateDistance(lastRequiredInfo.getLat(), lastRequiredInfo.getLng(), info.getLat(), info.getLng())>=Setting.MAXKM){
+						Log.w("BL","Retrieved="+retrieved+ " and DistanceBetweenCoords="+DistanceBetweenCoords.CalculateDistance(lastRequiredInfo.getLat(), lastRequiredInfo.getLng(), info.getLat(), info.getLng()));
+						getPoIList();
+						lastRequiredInfo=info;
+					}
+	        				
+					//applica il filtro appropriato alla lista completa per verificare la presenza di nuovi PoI nel raggio interessante per l'applicazione
+	        		if(returnedList!=null && !returnedList.isEmpty()){
+		        		if(statoContesto.getId_stato_moto()==AppDictionary.MOTION_CAR)
+		        			filter=new FilterInAuto();
+		        			
+		        		else
+		        			filter=new FilterByFoot();
+	
+		        		filteredList=filter.getFilteredList(returnedList,info.getLat(),info.getLng());
+		        		
+		        		/*for(PoI p: filteredList){
+		        			Log.w("BL",p.toString());
+		        		}*/
+		        		
+		        		IntentHelper.addObjectForKey(AppDictionary.POI, filteredList);
+		        		intent.putExtra(AppDictionary.POI, true);
+		        		//Log.w("BL","Sent POI!");
+		        		sendBroadcast(intent);
 	        		}
-	        		
-	        		IntentHelper.addObjectForKey(AppDictionary.POI, filteredList);
-	        		intent.putExtra(AppDictionary.POI, true);
-	        		Log.w("BL","Sent POI!");
-	        		sendBroadcast(intent);
-        		}
-        				
-        		if(info!=null && info.isLocalizationAvailable()){
-        			IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
-	        		intent.putExtra(AppDictionary.CONTEXT_INFO, true);
-	        		sendBroadcast(intent);
-        		}
+	        				
+	        		if(info!=null && info.isLocalizationAvailable()){
+	        			IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
+		        		intent.putExtra(AppDictionary.CONTEXT_INFO, true);
+		        		sendBroadcast(intent);
+	        		}
+				}
 			}
 		};
 		timer = new Timer();
