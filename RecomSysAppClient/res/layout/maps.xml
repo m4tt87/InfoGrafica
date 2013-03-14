@@ -13,9 +13,61 @@
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
      See the License for the specific language governing permissions and
      limitations under the License.
--->
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@+id/map"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  class="com.google.android.gms.maps.SupportMapFragment"/>
+ -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal" >
+        <android.opengl.GLSurfaceView
+            android:id="@+id/glsurfaceview4"
+            android:gravity="center"
+            android:layout_weight="0.8"
+            android:layout_width="0dip"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.8"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+		
+		<android.opengl.GLSurfaceView
+            android:id="@+id/glsurfaceview1"
+            android:gravity="left"
+            android:layout_width="40dp"
+            android:layout_height="match_parent" />
+
+        <fragment
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/map"
+            android:layout_width="0dip"
+            android:layout_weight="0.8"
+            android:layout_height="match_parent"
+            class="com.google.android.gms.maps.SupportMapFragment" />
+
+        <android.opengl.GLSurfaceView
+            android:id="@+id/glsurfaceview2"
+            android:gravity="right"
+            android:layout_width="40dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+        <android.opengl.GLSurfaceView
+            android:id="@+id/glsurfaceview3"
+            android:gravity="center"
+            android:layout_weight="0.8"
+            android:layout_width="0dip"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+</LinearLayout>

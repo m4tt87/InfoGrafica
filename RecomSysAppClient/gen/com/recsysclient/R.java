@@ -129,7 +129,8 @@ containing a value of this type.
     }
     public static final class drawable {
         public static final int applogo2=0x7f020000;
-        public static final int ic_launcher=0x7f020001;
+        public static final int arrow=0x7f020001;
+        public static final int ic_launcher=0x7f020002;
     }
     public static final class id {
         public static final int button_lancia_servizio=0x7f060016;
@@ -139,10 +140,14 @@ containing a value of this type.
         public static final int eventList=0x7f060006;
         public static final int event_icon=0x7f06000a;
         public static final int event_name=0x7f06000b;
+        public static final int glsurfaceview1=0x7f060029;
+        public static final int glsurfaceview2=0x7f06002b;
+        public static final int glsurfaceview3=0x7f06002c;
+        public static final int glsurfaceview4=0x7f060028;
         public static final int label_titolo_lista_eventi=0x7f060004;
         public static final int label_titolo_lista_servizi=0x7f060007;
         public static final int linearLayout1=0x7f060017;
-        public static final int map=0x7f060028;
+        public static final int map=0x7f06002a;
         public static final int nessun_evento_tv=0x7f060005;
         public static final int nessun_servizio_tv=0x7f060008;
         public static final int nome_evento_tv=0x7f06000d;

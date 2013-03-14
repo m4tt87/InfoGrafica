@@ -202,6 +202,7 @@ public class MyLocationListener implements LocationListener {
 		//accuratezza
 		_accuracy = (float)location.getAccuracy();
 		((ValoreDecimale)_location_table.get(AppDictionary.KEY_LOCATION_ACCURACY)).setValore(_accuracy);
+		Log.e("MyLocationListener","accuracy="+_accuracy);
 		
 		//velocità
 		if (location.hasSpeed()) {

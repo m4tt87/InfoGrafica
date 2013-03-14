@@ -13,10 +13,9 @@ public class FilterByFoot implements StrategyFilterResults {
 	@Override
 	public Set<PoI> getFilteredList(Set<PoI> p, double currLat, double currLng) {
 		Set<PoI> filteredList= new HashSet<PoI>();
-		Iterator<PoI> i= p.iterator();
-		PoI instance;
-		while(i.hasNext()){
-			instance= i.next();
+		Set<PoI> ps=new HashSet<PoI>(p);
+		for(PoI instance:ps){
+			
 			if(DistanceBetweenCoords.CalculateDistance(currLat,currLng,instance.getLat(),instance.getLng())<=fixedRange)
 				filteredList.add(instance);
 		}

@@ -10,6 +10,6 @@ import com.recsysclient.maps.utils.MapsVisibleRegion;
 
 public interface IComputeExternalMarkersStrategy {
 
-	public Map<Integer, List<ExternalMarker>> computeExternalMarkers(Set<PoI> pois, MapsVisibleRegion region, double d);
+	public Map<Integer, Map<Long, ExternalMarker>> computeExternalMarkers(Set<PoI> pois, MapsVisibleRegion region, double d);
 
 }

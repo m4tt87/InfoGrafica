@@ -195,7 +195,7 @@ public class MySensorListener implements SensorEventListener {
 			v.setTimestamp(event_timestamp);
 			v.setValore(values.clone());
 			//debug
-			System.out.println("Il valore orientation è cambiato a: "+values[0]);
+			//System.out.println("Il valore orientation è cambiato a: "+values[0]);
 			break;
 		/*case Sensor.TYPE_LIGHT:
 			v = (ValoreVettore)_table_valori_sensori.get(AppDictionary.KEY_LIGHT_SENSOR);

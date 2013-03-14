@@ -89,6 +89,8 @@ public class BusinessLogic extends Service{
 			@Override
 			public void run() {
 				statoContesto = statusDetector.calcolaStatoContesto();
+				if( intent.getExtras() !=null)
+					intent.getExtras().clear();
 				
 				if(statoContesto!=null){
 					info.setLat(statoContesto.getLatitudine());
@@ -100,9 +102,9 @@ public class BusinessLogic extends Service{
 					//Log.w("BL","accuratezza: " + statoContesto.getAccuratezza());
 					
 					//determinazione dell'esistenza di una localizzazione, anche se poco accurata
-					if((info.getLat()==-1 && info.getLng()==-1 && statoContesto.getAltitudine()==-1) || statoContesto.getAccuratezza()<Setting.REQUIRED_ACCURACY){
+					if((info.getLat()==-1 && info.getLng()==-1 && statoContesto.getAltitudine()==-1) || statoContesto.getAccuratezza()>Setting.REQUIRED_ACCURACY){
 							info.setLocalizationAvailable(false);
-							Log.w("BL","info.isLocalizationAvailable=FALSE");
+							Log.w("BL","info.isLocalizationAvailable=FALSE: "+info.getLat()+" "+info.getLng());
 					}
 					else info.setLocalizationAvailable(true);
 					//FIXME da commentare quando il server sarà su
@@ -128,24 +130,26 @@ public class BusinessLogic extends Service{
 		        			
 		        		else
 		        			filter=new FilterByFoot();
-	
-		        		filteredList=filter.getFilteredList(returnedList,info.getLat(),info.getLng());
+		        		filteredList=new HashSet<PoI>(filter.getFilteredList(returnedList,info.getLat(),info.getLng()));
 		        		
 		        		/*for(PoI p: filteredList){
 		        			Log.w("BL",p.toString());
 		        		}*/
 		        		
-		        		IntentHelper.addObjectForKey(AppDictionary.POI, filteredList);
+		        		//IntentHelper.addSetOfObjectForKey(AppDictionary.POI, filteredList);
+		        		IntentHelper.setPs(filteredList);
 		        		intent.putExtra(AppDictionary.POI, true);
 		        		//Log.w("BL","Sent POI!");
-		        		sendBroadcast(intent);
 	        		}
 	        				
 	        		if(info!=null && info.isLocalizationAvailable()){
-	        			IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
-		        		intent.putExtra(AppDictionary.CONTEXT_INFO, true);
-		        		sendBroadcast(intent);
+	        			//IntentHelper.addObjectForKey(AppDictionary.CONTEXT_INFO, info);
+	        			IntentHelper.setCi(info);
+	        			intent.putExtra(AppDictionary.CONTEXT_INFO, true);		        		
 	        		}
+	        		
+	        		if( intent.getExtras()!=null && ( intent.getExtras().containsKey(AppDictionary.CONTEXT_INFO) || intent.getExtras().containsKey(AppDictionary.POI)))
+	        			sendBroadcast(intent);
 				}
 			}
 		};

@@ -57,6 +57,11 @@ public class RetrieveWikipediaPoI implements StrategyRetrievePoI{
 				t1=System.currentTimeMillis();
 				Gson gson = new Gson();
 				PoISet ps = gson.fromJson(response, PoISet.class); 
+				
+				if(ps==null){
+					return null;
+				}
+				
 				poiSet=ps.getPoiSet();
 				
 				t1=System.currentTimeMillis()-t1;

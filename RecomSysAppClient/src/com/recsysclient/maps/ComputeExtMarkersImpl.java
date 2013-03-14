@@ -1,15 +1,8 @@
 package com.recsysclient.maps;
 
-import java.lang.reflect.Array;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.VisibleRegion;
 import com.recsysclient.entity.PoI;
 import com.recsysclient.maps.utils.ExternalMarker;
 import com.recsysclient.maps.utils.MapsLatLng;
@@ -24,21 +17,22 @@ public class ComputeExtMarkersImpl implements IComputeExternalMarkersStrategy {
 	private double[] diagonal2;// nearRight-farLeft
 	
 	@Override
-	public Map<Integer, List<ExternalMarker>> computeExternalMarkers(Set<PoI> pois,
+	public Map<Integer, Map<Long, ExternalMarker>> computeExternalMarkers(Set<PoI> pois,
 			MapsVisibleRegion region, double bearing) {
-
+		
+		
 		double[] translation = computeTranslationVector(region);
 		
 		region = applyTransformationToRegion( region, bearing, translation);
 		
 		setupLinesParameters(region);
 		
-		Map<Integer,List<ExternalMarker>> externalMarkers = new HashMap<Integer,List<ExternalMarker>>();
+		Map<Integer,Map<Long,ExternalMarker>> externalMarkers = new HashMap<Integer, Map<Long,ExternalMarker> >();
 		
-		externalMarkers.put(0, new LinkedList<ExternalMarker>());
-		externalMarkers.put(1, new LinkedList<ExternalMarker>());
-		externalMarkers.put(2, new LinkedList<ExternalMarker>());
-		externalMarkers.put(3, new LinkedList<ExternalMarker>());
+		externalMarkers.put(1, new HashMap<Long,ExternalMarker>());
+		externalMarkers.put(2, new HashMap<Long,ExternalMarker>());
+		externalMarkers.put(3, new HashMap<Long,ExternalMarker>());
+		externalMarkers.put(4, new HashMap<Long,ExternalMarker>());
 		
 		float bottomEdgeLength = distance2(region.nearRight,region.nearLeft);
 		float upEdgeLength = distance2(region.farLeft,region.farRight);
@@ -47,8 +41,6 @@ public class ComputeExtMarkersImpl implements IComputeExternalMarkersStrategy {
 		
 		for ( PoI p : pois ){
 			MapsLatLng coords = applyTransformation( new MapsLatLng(p.getLat(), p.getLng()), bearing, translation );
-			p.setLat(coords.latitude);
-			p.setLng(coords.longitude);
 			if(!isIntoVisibleRegion( region, coords)){
 				double f1=Math.signum(diagonal1[0]*coords.longitude+diagonal1[1]-coords.latitude);				
 				double f2=Math.signum(diagonal2[0]*coords.longitude+diagonal2[1]-coords.latitude);
@@ -56,20 +48,20 @@ public class ComputeExtMarkersImpl implements IComputeExternalMarkersStrategy {
 					double intersecX = rightEdge[1]/( (coords.latitude/coords.longitude) - rightEdge[0] );
 					double intersecY = rightEdge[0]*intersecX + rightEdge[1];
 					float position = distance2(region.nearRight, new MapsLatLng(intersecY,intersecX))/rightEdgeLength;
-					externalMarkers.get(0).add( new ExternalMarker(p,position));
+					externalMarkers.get(1).put( p.getId(),new ExternalMarker(p,position));
 				} else if(f1 < 0 && f2 < 0){//sinistra
 					double intersecX = leftEdge[1]/( (coords.latitude/coords.longitude) - leftEdge[0] );
 					double intersecY = rightEdge[0]*intersecX + rightEdge[1];
 					float position = distance2(region.nearLeft, new MapsLatLng(intersecY,intersecX))/leftEdgeLength;
-					externalMarkers.get(2).add( new ExternalMarker(p,position));
+					externalMarkers.get(3).put( p.getId(),new ExternalMarker(p,position));
 				} else if(f1 < 0 && f2 > 0){//sopra
 					double intersecX = (coords.latitude/coords.longitude)*region.farLeft.latitude;
 					float position = distance2(region.farLeft, new MapsLatLng(region.farLeft.latitude,intersecX))/upEdgeLength;
-					externalMarkers.get(1).add( new ExternalMarker(p,position));
+					externalMarkers.get(2).put( p.getId(),new ExternalMarker(p,position));
 				} else {//sotto
 					double intersecX = (coords.latitude/coords.longitude)*region.nearLeft.latitude;
 					float position = distance2(region.nearLeft, new MapsLatLng(region.nearLeft.latitude,intersecX))/bottomEdgeLength;
-					externalMarkers.get(3).add( new ExternalMarker(p,position));
+					externalMarkers.get(4).put( p.getId(),new ExternalMarker(p,position));
 				}
 			}
 		}
@@ -78,7 +70,7 @@ public class ComputeExtMarkersImpl implements IComputeExternalMarkersStrategy {
 	}
 	
 	private float distance2(MapsLatLng point1, MapsLatLng point2) {
-		return (float) (Math.pow( point1.latitude-point2.latitude,2) - Math.pow( point1.longitude-point2.longitude,2)); 
+		return (float) (Math.pow( point1.latitude-point2.latitude,2) + Math.pow( point1.longitude-point2.longitude,2)); 
 	}
 
 	private void setupLinesParameters(MapsVisibleRegion region) {
@@ -105,6 +97,8 @@ public class ComputeExtMarkersImpl implements IComputeExternalMarkersStrategy {
 			MapsLatLng coords) {
 		if( coords.latitude > region.farLeft.latitude || coords.latitude < region.nearLeft.latitude)
 			return false;
+		if ( coords.longitude > region.farRight.longitude || coords.longitude < region.farLeft.longitude)
+			return false;
 		if( coords.longitude <= region.nearRight.longitude && coords.longitude >= region.nearLeft.longitude)
 			return true;
 		if( coords.latitude > leftEdge[0]*coords.longitude + leftEdge[1] && coords.latitude > rightEdge[0]*coords.longitude + rightEdge[1] )
@@ -117,16 +111,19 @@ public class ComputeExtMarkersImpl implements IComputeExternalMarkersStrategy {
 		region.farRight = applyTransformation( region.farRight, bearing, translation );
 		region.nearLeft = applyTransformation( region.nearLeft, bearing, translation );
 		region.nearRight = applyTransformation( region.nearRight, bearing, translation );
+				
 		return region;	
 	}
 	
 	private MapsLatLng applyTransformation( MapsLatLng coords, double rotationAngle, double[] translation ){
 		coords.latitude = coords.latitude+translation[0];
 		coords.longitude = coords.longitude+translation[1];
-
+		
+		rotationAngle = Math.toRadians(rotationAngle);
+		
 		MapsLatLng newCoords = new MapsLatLng();
-		newCoords.latitude = coords.longitude*Math.cos(rotationAngle)-coords.latitude*Math.sin(rotationAngle);
-		newCoords.longitude = coords.longitude*Math.sin(rotationAngle)+coords.latitude*Math.cos(rotationAngle);
+		newCoords.longitude = coords.longitude*Math.cos(rotationAngle)-coords.latitude*Math.sin(rotationAngle);
+		newCoords.latitude = coords.longitude*Math.sin(rotationAngle)+coords.latitude*Math.cos(rotationAngle);
 
 		return newCoords;		
 	}

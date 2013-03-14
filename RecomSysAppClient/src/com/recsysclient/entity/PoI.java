@@ -1,8 +1,6 @@
 package com.recsysclient.entity;
 
-import java.io.Serializable;
-
-public class PoI implements Serializable{
+public class PoI implements Cloneable{
 	/**
 	 * 
 	 */
@@ -16,7 +14,7 @@ public class PoI implements Serializable{
 	private String wikipediaUrl;
 	private float distance;
 	private String modelURI; //eventuale URI al file contenente il modello 3D
-	
+
 	public long getId() {
 		return id;
 	}
@@ -65,7 +63,7 @@ public class PoI implements Serializable{
 	public void setModelURI(String modelURI) {
 		this.modelURI = modelURI;
 	}
-	
+
 	public float getDistance() {
 		return distance;
 	}
@@ -73,10 +71,10 @@ public class PoI implements Serializable{
 		this.distance = distance;
 	}
 	@Override
-    public String toString() {
-        return "PoI [lat=" + lat + ", lng=" + lng + ", title="+ title +", descr="+summary+"]";
-    }
-	
+	public String toString() {
+		return "PoI [lat=" + lat + ", lng=" + lng + ", title="+ title +", descr="+summary+"]";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -89,6 +87,36 @@ public class PoI implements Serializable{
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
-	
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PoI other = (PoI) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
+	public Object clone()
+	{
+		try
+		{
+			PoI p = (PoI) super.clone();
+			// copia bit a bit: I due oggetti condividono il reference
+			// all'oggetto B
+			return p;
+		}
+		catch (CloneNotSupportedException e)
+		{
+			// Non si arriva mai qui: implementato solo per
+			// soddisfare le verifiche del compilatore
+			return null;
+		}
+	}
+
 }

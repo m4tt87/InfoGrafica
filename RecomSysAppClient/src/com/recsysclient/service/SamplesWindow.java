@@ -169,16 +169,10 @@ public class SamplesWindow{
 			d = (ValoreDecimale) location_table.get(AppDictionary.KEY_LOCATION_ACCURACY); 
 			if(d!=null)
 				list_accuracy.add((float) d.getValore());
-			else{
-				list_accuracy.add(0f);
-			}
 			
 			d = (ValoreDecimale) location_table.get(AppDictionary.KEY_LOCATION_SPEED); 
 			if(d!=null)
-				list_speed.add((float) d.getValore());	
-			else{
-				list_speed.add(0f);
-			}
+				list_speed.add((float) d.getValore());
 		}
 		_gps_status = GPS_status;
 		

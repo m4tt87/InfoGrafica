@@ -8,7 +8,7 @@ public class ExternalMarker {
 	private float position; // posizione lungo la barra degli indicatori
 	
 	public ExternalMarker( PoI point, float position){
-		this.point=point;
+		this.point = (PoI) point.clone();
 		this.position=position;		
 	}
 
